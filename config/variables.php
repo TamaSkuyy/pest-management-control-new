@@ -1,0 +1,28 @@
+<?php
+// Variables
+return [
+    "creatorName" => "Sekuyy",
+    "creatorUrl" => "https://github.com/TamaSkuyy/",
+    "templateName" => "Sekuyy",
+    "templateSuffix" => "Bootstrap Dashboard",
+    "templateVersion" => "1.0.0",
+    "templateFree" => true,
+    "templateDescription" => "Pest Management Control Apps",
+    "templateKeyword" => "Pest Management Control Apps",
+    "licenseUrl" => "https://github.com/TamaSkuyy/",
+    "livePreview" => "",
+    "productPage" => "",
+    "productPagePro" => "",
+    "support" => "https://github.com/TamaSkuyy/",
+    "moreThemes" => "",
+    "documentation" => "",
+    "repository" => "https://github.com/TamaSkuyy/",
+    "gitRepo" => "https://github.com/TamaSkuyy/",
+    "gitRepoAccess" => "",
+    "githubFreeUrl" => "https://github.com/TamaSkuyy/",
+    "facebookUrl" => "",
+    "twitterUrl" => "",
+    "githubUrl" => "https://github.com/TamaSkuyy/",
+    "dribbbleUrl" => "",
+    "instagramUrl" => "",
+];

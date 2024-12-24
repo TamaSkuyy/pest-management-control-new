@@ -1,0 +1,56 @@
+{
+  "menu": [
+    {
+      "url": "dashboard",
+      "name": "Dashboard",
+      "icon": "menu-icon tf-icons bx bx-home-smile",
+      "slug": "dashboard",
+      "role": "user"
+    },
+    {
+      "url": "/admin/users",
+      "name": "Users",
+      "icon": "menu-icon tf-icons bx bx-user",
+      "slug": "admin.users.index",
+      "role": "admin"
+    },
+    {
+      "name": "Master",
+      "icon": "menu-icon tf-icons bx bx-book",
+      "slug": "master",
+      "role": "user",
+      "submenu": [
+        {
+          "url": "/master/metode",
+          "name": "Metode",
+          "slug": "master.metode.index"
+        },
+        {
+          "url": "/master/lokasi",
+          "name": "Lokasi",
+          "slug": "master.lokasi.index"
+        },
+        {
+          "url": "/master/hama",
+          "name": "Hama",
+          "slug": "master.hama.index"
+        },
+        {
+          "url": "/master/tindakan",
+          "name": "Tindakan",
+          "slug": "master.tindakan.index"
+        }
+      ]
+    },
+    {
+      "url": "/inspeksi",
+      "name": "Inspeksi",
+      "icon": "menu-icon tf-icons bx bx-search",
+      "role": "user",
+      "slug": [
+        "inspeksi.index",
+        "inspeksi.create"
+      ]
+    }
+  ]
+}
