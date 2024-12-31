@@ -2130,16 +2130,12 @@ bootstrap-maxlength@1.10.1:
     jquery "^3.5.1"
     qunit "^2.10.0"
 
-bootstrap-select@snapappointments/bootstrap-select#main:
-  version "1.14.0-beta3"
-  resolved "git+ssh://git@github.com/snapappointments/bootstrap-select.git#939e94b14a34759e193f616b753e0a33081cc0c5"
-
 bootstrap@^4.4.1:
   version "4.6.2"
   resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-4.6.2.tgz"
   integrity sha512-51Bbp/Uxr9aTuy6ca/8FbFloBUJZLHwnhTcnjIeRn2suQWsWzcuJhGjKDB5eppVte/8oCdOL3VuwxvZDUggwGQ==
 
-bootstrap@>=3.0.0, bootstrap@5.3.3:
+bootstrap@5.3.3:
   version "5.3.3"
   resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-5.3.3.tgz"
   integrity sha512-8HLCdWgyoMguSO9o+aH+iuZ+aht+mzW0u3HIMzVu7Srrpv7EBBxTnrFlSCskwdY1+EOFQSm7uMJhNQHkdPcmjg==
