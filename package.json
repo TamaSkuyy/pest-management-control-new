@@ -133,7 +133,7 @@
     "bootstrap-datepicker": "1.9.0",
     "bootstrap-daterangepicker": "3.1.0",
     "bootstrap-maxlength": "1.10.1",
-    "bootstrap-select": "snapappointments/bootstrap-select#main",
+    // "bootstrap-select": "snapappointments/bootstrap-select#main",
     "boxicons": "2.1.4",
     "bs-stepper": "1.7.0",
     "chart.js": "3.9.1",
