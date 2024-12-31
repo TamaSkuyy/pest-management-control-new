@@ -16,6 +16,7 @@
 $white: #fff !default;
 $black: #22303e !default;
 $gray-25: rgba($black, 0.025) !default; // (C)
+$gray-50: rgba($black, 0.05) !default; // (C)
 $gray-60: rgba($black, 0.06) !default; // (C)
 $gray-80: rgba($black, 0.08) !default; // (C)
 $gray-100: rgba($black, 0.1) !default;
@@ -32,6 +33,7 @@ $gray-900: rgba($black, 0.9) !default;
 // scss-docs-start gray-colors-map
 $grays: (
   '25': $gray-25,
+  '50': $gray-50,
   '60': $gray-60,
   '80': $gray-80
 ) !default;
