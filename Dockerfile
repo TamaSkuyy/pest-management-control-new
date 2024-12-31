@@ -1,16 +1,22 @@
-FROM dunglas/frankenphp:latest-php8.3
+# Base image
+FROM dunglas/frankenphp:latest
 
-COPY --chown=82:82 . /app
-WORKDIR /app
+# Set working directory
+WORKDIR /srv/app
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copy application files
+COPY . .
 
-RUN install-php-extensions pdo_mysql zip bcmath pcntl opcache
-
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-RUN chmod -R 775 /app/storage /app/bootstrap/cache
+# Set permissions
+RUN chown -R www-data:www-data /srv/app
 
-EXPOSE 8000
+# Expose the port used by FrankenPHP
+EXPOSE 80
 
-CMD ["php", "artisan", "octane:frankenphp", "--host=0.0.0.0", "--port=8000"]
+CMD php artisan migrate --force
+
+# Command to start FrankenPHP
+CMD ["frankenphp", "serve", "--port=80", "--config=/srv/app/frankenphp.conf"]
