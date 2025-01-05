@@ -10,6 +10,14 @@
   }
 }
 
+@mixin dark-layout-only() {
+  @if $dark-style {
+    .dark-style {
+      @content;
+    }
+  }
+}
+
 // * RTL/LTR
 // *******************************************************************************
 
@@ -23,6 +31,14 @@
   }
 }
 
+@mixin rtl-only() {
+  @if $rtl-support {
+    [dir='rtl'] {
+      @content;
+    }
+  }
+}
+
 @mixin ltr-style() {
   @if $rtl-support {
     html:not([dir='rtl']) & {
@@ -30,6 +46,14 @@
     }
   } @else {
     @content;
+  }
+}
+
+@mixin rtl-style() {
+  @if $rtl-support {
+    [dir='rtl'] & {
+      @content;
+    }
   }
 }
 
@@ -114,10 +138,7 @@
     color: $color !important;
   }
   //! Fix: text-body hover color
-  .text-body,
-  .text-heading {
-    &[href]:hover {
-      color: shift-color($color, $link-shade-percentage) !important;
-    }
+  .text-body[href]:hover {
+    color: shift-color($color, $link-shade-percentage) !important;
   }
 }

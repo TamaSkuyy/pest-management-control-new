@@ -2,10 +2,15 @@
 
     <!-- ! Hide app brand if navbar-full -->
     <div class="app-brand demo">
-        <a href="{{ url('/') }}" class="app-brand-link">
-            <span class="app-brand-logo demo">@include('_partials.macros', ['width' => 25, 'withbg' => 'var(--bs-primary)'])</span>
-            <span class="app-brand-text demo menu-text fw-bold ms-2">{{ config('variables.templateName') }}</span>
-        </a>
+        <div class="d-flex align-items-center">
+            <img src="{{ asset('assets/img/icons/Logo_Orangtua.png') }}" alt="Logo" class="app-brand-logo"
+                width="32">
+            <img src="{{ asset('assets/img/icons/logo_k3.png') }}" alt="Logo 2" class="app-brand-logo ms-2"
+                width="32">
+            <a href="{{ url('/dashboard') }}" class="ms-2">
+                <span class="app-brand-text demo text-body fw-bolder">PMC</span>
+            </a>
+        </div>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
             <i class="bx bx-chevron-left bx-sm d-flex align-items-center justify-content-center"></i>

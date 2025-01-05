@@ -1,7 +1,4 @@
-@import 'bootstrap/scss/mixins/banner';
-@include bsBanner('');
-
-@import '_bootstrap-extended/include';
+@import '_bootstrap-extended/include-dark';
 
 // Import bootstrap core scss from node_module
 // ! Utilities are customized and added in bootstrap-extended
@@ -37,7 +34,6 @@
 @import 'bootstrap/scss/carousel';
 @import 'bootstrap/scss/spinners';
 @import 'bootstrap/scss/offcanvas';
-@import 'bootstrap/scss/placeholders';
 
 // Helpers
 @import 'bootstrap/scss/helpers';

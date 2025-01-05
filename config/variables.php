@@ -3,7 +3,7 @@
 return [
     "creatorName" => "Sekuyy",
     "creatorUrl" => "https://github.com/TamaSkuyy/",
-    "templateName" => "Sekuyy",
+    "templateName" => "PT Savana Tirta Makmur",
     "templateSuffix" => "Bootstrap Dashboard",
     "templateVersion" => "1.0.0",
     "templateFree" => true,

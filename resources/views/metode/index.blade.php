@@ -10,15 +10,15 @@
     <!-- Row Group CSS -->
     @vite('resources/assets/vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.scss')
 
-    @vite('resources/assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')
+    {{-- @vite('resources/assets/vendor/libs/formvalidation/dist/css/formValidation.min.css') --}}
     @vite('resources/assets/vendor/libs/sweetalert2/sweetalert2.scss')
 @endsection
 
 @section('vendor-script')
     @vite('resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')
-    @vite('resources/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')
+    {{-- @vite('resources/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')
     @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')
-    @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js')
+    @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js') --}}
     @vite('resources/assets/vendor/libs/sweetalert2/sweetalert2.js')
 @endsection
 
@@ -498,7 +498,7 @@
                 }, 200);
 
                 // Form validation for Add new record
-                fv = FormValidation.formValidation(formAddNewRecord, {
+                fv = formValidation(formAddNewRecord, {
                     fields: {
                         metode_kode: {
                             validators: {
@@ -523,13 +523,13 @@
                         }
                     },
                     plugins: {
-                        trigger: new FormValidation.plugins.Trigger(),
-                        bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        trigger: new Trigger(),
+                        bootstrap5: new Bootstrap5({
                             eleValidClass: '',
                             rowSelector: '.col-sm-12'
                         }),
-                        submitButton: new FormValidation.plugins.SubmitButton(),
-                        autoFocus: new FormValidation.plugins.AutoFocus()
+                        submitButton: new SubmitButton(),
+                        autoFocus: new AutoFocus()
                     }
                 });
 
@@ -592,7 +592,7 @@
                 }, 300);
 
                 // Form validation for Edit record
-                fvedit = FormValidation.formValidation(formUpdateRecord, {
+                fvedit = formValidation(formUpdateRecord, {
                     fields: {
                         fields: {
                             metode_kode: {
@@ -619,13 +619,13 @@
                         }
                     },
                     plugins: {
-                        trigger: new FormValidation.plugins.Trigger(),
-                        bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        trigger: new Trigger(),
+                        bootstrap5: new Bootstrap5({
                             eleValidClass: '',
                             rowSelector: '.col-sm-12'
                         }),
-                        submitButton: new FormValidation.plugins.SubmitButton(),
-                        autoFocus: new FormValidation.plugins.AutoFocus()
+                        submitButton: new SubmitButton(),
+                        autoFocus: new AutoFocus()
                     }
                 });
 

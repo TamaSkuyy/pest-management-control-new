@@ -14,7 +14,6 @@
     position: relative;
     display: inline-block;
     font-size: $divider-font-size;
-    color: $divider-text-color;
     padding: $divider-text-padding-y $divider-text-padding-x;
 
     i {
@@ -77,6 +76,36 @@
         border-style: dashed;
         border-width: 0 1px 1px;
         border-color: $divider-color;
+      }
+    }
+  }
+}
+
+// RTL
+@include rtl-only {
+  .divider {
+    &.text-start-center {
+      .divider-text {
+        right: -25%;
+        left: auto;
+      }
+    }
+    &.text-end-center {
+      .divider-text {
+        left: -25%;
+        right: auto;
+      }
+    }
+    &.text-start {
+      .divider-text {
+        padding-right: 0;
+        padding-left: $divider-text-padding-x;
+      }
+    }
+    &.text-end {
+      .divider-text {
+        padding-left: 0;
+        padding-right: $divider-text-padding-x;
       }
     }
   }

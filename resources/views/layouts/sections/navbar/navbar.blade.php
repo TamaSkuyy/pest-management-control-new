@@ -45,6 +45,14 @@
           </div>
         </div> --}}
     <!-- /Search -->
+    <div class="navbar-nav align-items-center">
+        <div class="nav-item d-flex align-items-center">
+            <span class="fw-bold fs-4 text-primary">
+                <i class="bx bx-building-house me-2"></i>
+                PT. SAVANA TIRTA MAKMUR
+            </span>
+        </div>
+    </div>
     <ul class="navbar-nav flex-row align-items-center ms-auto">
 
         <!-- Place this tag where you want the button to render. -->

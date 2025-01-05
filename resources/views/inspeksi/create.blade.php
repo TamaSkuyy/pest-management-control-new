@@ -10,20 +10,20 @@
     <!-- Row Group CSS -->
     @vite('resources/assets/vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.scss')
 
-    @vite('resources/assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')
+    {{-- @vite('resources/assets/vendor/libs/formvalidation/dist/css/formValidation.min.css') --}}
     @vite('resources/assets/vendor/libs/sweetalert2/sweetalert2.scss')
     @vite('resources/assets/vendor/libs/select2/select2.scss')
-    @vite('resources/assets/vendor/libs/bootstrap-select/bootstrap-select.scss')
+    {{-- @vite('resources/assets/vendor/libs/bootstrap-select/bootstrap-select.scss') --}}
 @endsection
 
 @section('vendor-script')
     @vite('resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')
-    @vite('resources/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')
+    {{-- @vite('resources/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')
     @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')
-    @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js')
+    @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js') --}}
     @vite('resources/assets/vendor/libs/sweetalert2/sweetalert2.js')
     @vite('resources/assets/vendor/libs/select2/select2.js')
-    @vite('resources/assets/vendor/libs/bootstrap-select/bootstrap-select.js')
+    {{-- @vite('resources/assets/vendor/libs/bootstrap-select/bootstrap-select.js') --}}
 @endsection
 
 @section('page-script')
@@ -135,7 +135,7 @@
                 });
 
                 // Inspeksi
-                const FormValidation1 = FormValidation.formValidation(wizardValidationFormStep1, {
+                const FormValidation1 = formValidation(wizardValidationFormStep1, {
                     fields: {
                         metode_id: {
                             validators: {
@@ -188,15 +188,15 @@
                         }
                     },
                     plugins: {
-                        trigger: new FormValidation.plugins.Trigger(),
-                        bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        trigger: new Trigger(),
+                        bootstrap5: new Bootstrap5({
                             // Use this for enabling/changing valid/invalid class
                             // eleInvalidClass: '',
                             eleValidClass: '',
                             rowSelector: '.col-sm-6, .col-sm-4'
                         }),
-                        autoFocus: new FormValidation.plugins.AutoFocus(),
-                        submitButton: new FormValidation.plugins.SubmitButton()
+                        autoFocus: new AutoFocus(),
+                        submitButton: new SubmitButton()
                     },
                     init: instance => {
                         instance.on('plugins.message.placed', function(e) {

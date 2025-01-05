@@ -56,3 +56,29 @@
 .navbar-light hr {
   border-color: $gray-100;
 }
+
+// RTL Style
+// ******************************************************************************
+
+@include rtl-only {
+  .navbar-nav {
+    padding-right: 0;
+  }
+
+  .navbar-brand {
+    margin-right: 0;
+    margin-left: $navbar-padding-x;
+  }
+}
+
+// Mega dropdown
+// ******************************************************************************
+
+.mega-dropdown {
+  .dropdown-toggle {
+    outline: 0;
+  }
+  .dropdown-menu {
+    width: 100%;
+  }
+}

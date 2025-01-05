@@ -1,6 +1,10 @@
 @php
-use Illuminate\Support\Facades\Vite;
+    use Illuminate\Support\Facades\Vite;
 @endphp
+
+<!-- Core JS -->
+@vite(['resources/js/app.js'])
+
 <!-- laravel style -->
 @vite(['resources/assets/vendor/js/helpers.js'])
 

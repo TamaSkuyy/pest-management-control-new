@@ -1,4 +1,4 @@
-@import '_bootstrap-extended/include';
+@import '_bootstrap-extended/include-dark';
 
 // Import bootstrap extended scss
 @import '_bootstrap-extended/root';
@@ -33,6 +33,7 @@
 @import 'bootstrap/scss/utilities/api';
 
 // LTR Utilities
+
 @include ltr-only {
   @import '_bootstrap-extended/utilities-ltr';
   @import 'bootstrap/scss/utilities/api';

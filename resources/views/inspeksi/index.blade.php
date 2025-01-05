@@ -10,15 +10,15 @@
     <!-- Row Group CSS -->
     @vite('resources/assets/vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.scss')
 
-    @vite('resources/assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')
+    {{-- @vite('resources/assets/vendor/libs/formvalidation/dist/css/formValidation.min.css') --}}
     @vite('resources/assets/vendor/libs/sweetalert2/sweetalert2.scss')
 @endsection
 
 @section('vendor-script')
     @vite('resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')
-    @vite('resources/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')
+    {{-- @vite('resources/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')
     @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')
-    @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js')
+    @vite('resources/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js') --}}
     @vite('resources/assets/vendor/libs/sweetalert2/sweetalert2.js')
 @endsection
 

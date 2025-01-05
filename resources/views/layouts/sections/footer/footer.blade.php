@@ -16,7 +16,7 @@
                     class="footer-link">{{ !empty(config('variables.creatorName')) ? config('variables.creatorName') : '' }}</a>
             </div>
             <div class="d-none d-lg-inline-block">
-                {{-- <a href="{{ config('variables.licenseUrl') ? config('variables.licenseUrl') : '#' }}" class="footer-link me-4" target="_blank">License</a> --}}
+                <a href="#" class="footer-link me-4">Pt. Savana Tirta Makmur</a>
             </div>
         </div>
     </div>
