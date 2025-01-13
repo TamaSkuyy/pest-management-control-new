@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('metode_id')->constrained('metode')->onDelete('cascade');
             $table->foreignId('lokasi_id')->constrained('lokasi')->onDelete('cascade');
-            $table->foreignId('hama_id')->constrained('hama')->onDelete('cascade');
+            $table->foreignId('hama_id')->constrained('hama')->onDelete('cascade')->nullable();
             $table->date('tanggal');
             $table->string('pegawai');
             $table->integer('jumlah');
@@ -25,7 +25,7 @@ return new class extends Migration
         Schema::create('inspeksi_detail', function (Blueprint $table) {
             $table->id();
             $table->foreignId('inspeksi_id')->constrained('inspeksi')->onDelete('cascade');
-            $table->foreignId('tindakan_id')->constrained('tindakan')->onDelete('cascade');
+            $table->foreignId('tindakan_id')->constrained('tindakan')->onDelete('cascade')->nullable();
             $table->boolean('check')->nullable();
             $table->timestamps();
         });

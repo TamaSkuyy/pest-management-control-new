@@ -99,10 +99,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/inspeksi/{id}', [InspeksiController::class, 'destroy'])->name('inspeksi.destroy');
     //--datatables
     Route::get('/inspeksi/data', [InspeksiController::class, 'data'])->name('inspeksi.data');
+    Route::get('/inspeksi/dataperbulan', [InspeksiController::class, 'dataperbulan'])->name('inspeksi.dataperbulan');
+    Route::get('/inspeksi/datapermetode', [InspeksiController::class, 'datapermetode'])->name('inspeksi.datapermetode');
 
     //dashboard
     Route::get('/dashboard/linechart', [DashboardController::class, 'linechart'])->name('dashboard.linechart');
     Route::get('/dashboard/areachart', [DashboardController::class, 'areachart'])->name('dashboard.areachart');
+    Route::get('/dashboard/donutchart', [DashboardController::class, 'donutchart'])->name('dashboard.donutchart');
 
 });
 

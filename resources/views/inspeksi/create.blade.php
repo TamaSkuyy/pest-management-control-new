@@ -153,8 +153,15 @@
                         },
                         hama_id: {
                             validators: {
-                                notEmpty: {
-                                    message: 'Hama perlu dipilih'
+                                callback: {
+                                    message: 'Hama perlu dipilih',
+                                    callback: function(input) {
+                                        const metodeId = document.querySelector('#metode_id').value;
+                                        if (metodeId != 3) {
+                                            return input.value !== '';
+                                        }
+                                        return true;
+                                    }
                                 }
                             }
                         },
@@ -258,6 +265,18 @@
                             .on('change.select2', function() {
                                 // Revalidate the color field when an option is chosen
                                 FormValidation1.revalidateField('metode_id');
+                                const selectedValue = this.value;
+
+                                if (selectedValue != 3) {
+                                    $('.select2_hama').prop('disabled', false);
+                                    $('#tindakan-rbt-div').hide();
+                                    $('#tindakan-table-div').show();
+                                } else {
+                                    $(".select2_hama").val('').trigger('change')
+                                    $('.select2_hama').prop('disabled', true);
+                                    $('#tindakan-rbt-div').show();
+                                    $('#tindakan-table-div').hide();
+                                }
                             });
                     });
                 }
@@ -437,6 +456,15 @@
                         tanggal: $('#tanggal').val(),
                         pegawai: $('#pegawai').val(),
                         jumlah: $('#jumlah').val(),
+                        bahan_aktif: $('#bahan_aktif').val(),
+                        jumlah_bait: $('#jumlah_bait').val(),
+                        // Khusus metode RBT
+                        kondisi_umpan_utuh_bait: $('#kondisi_umpan_utuh_bait').val(),
+                        kondisi_umpan_kurang_bait: $('#kondisi_umpan_kurang_bait').val(),
+                        kondisi_umpan_rusak_bait: $('#kondisi_umpan_rusak_bait').val(),
+                        tindakan_ganti_bait: $('#tindakan_ganti_bait').val(),
+                        tindakan_tambah_bait: $('#tindakan_tambah_bait').val(),
+                        //
                         tindakan: tindakanIds
                     },
                     success: function(data) {
@@ -459,7 +487,6 @@
                     }
                 });
             })
-
         });
     </script>
 @endsection
@@ -557,8 +584,56 @@
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-sm-12">
-                                        <div class="col-sm-12">
-                                            {{-- <label class="form-label" for="tindakan-table">Tindakan</label> --}}
+                                        <div class="col-sm-12" id="tindakan-rbt-div">
+                                            <div class="row g-3">
+                                                <div class="col-sm-6">
+                                                    <label class="form-label" for="bahan_aktif">Bahan Aktif</label>
+                                                    <input type="text" name="bahan_aktif" id="bahan_aktif"
+                                                        class="form-control" placeholder="Bahan Aktif" />
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="form-label" for="jumlah_bait">Jumlah Bait</label>
+                                                    <input type="text" name="jumlah_bait" id="jumlah_bait"
+                                                        class="form-control" placeholder="Jumlah Bait" />
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="form-label" for="kondisi_umpan_utuh_bait">Kondisi Umpan
+                                                        Utuh</label>
+                                                    <input type="text" name="kondisi_umpan_utuh_bait"
+                                                        id="kondisi_umpan_utuh_bait" class="form-control"
+                                                        placeholder="Kondisi Umpan Utuh" />
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="form-label" for="kondisi_umpan_kurang_bait">Kondisi
+                                                        Umpan Kurang</label>
+                                                    <input type="text" name="kondisi_umpan_kurang_bait"
+                                                        id="kondisi_umpan_kurang_bait" class="form-control"
+                                                        placeholder="Kondisi Umpan Kurang" />
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="form-label" for="kondisi_umpan_rusak_bait">Kondisi Umpan
+                                                        Rusak</label>
+                                                    <input type="text" name="kondisi_umpan_rusak_bait"
+                                                        id="kondisi_umpan_rusak_bait" class="form-control"
+                                                        placeholder="Kondisi Umpan Rusak" />
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="form-label" for="tindakan_ganti_bait">Tindakan Ganti
+                                                        Bait</label>
+                                                    <input type="text" name="tindakan_ganti_bait"
+                                                        id="tindakan_ganti_bait" class="form-control"
+                                                        placeholder="Tindakan Ganti Bait" />
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="form-label" for="tindakan_tambah_bait">Tindakan Tambah
+                                                        Bait</label>
+                                                    <input type="text" name="tindakan_tambah_bait"
+                                                        id="tindakan_tambah_bait" class="form-control"
+                                                        placeholder="Tindakan Tambah Bait" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12" id="tindakan-table-div">
                                             <table id="tindakan-table" class="table table-bordered">
                                                 <thead>
                                                     <tr>

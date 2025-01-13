@@ -9,6 +9,7 @@ use App\Models\Lokasi;
 use App\Models\Metode;
 use App\Models\Tindakan;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class InspeksiController extends Controller
 {
@@ -50,11 +51,11 @@ class InspeksiController extends Controller
         if ($request->has('search') && !empty($request->search['value'])) {
             $search = $request->search['value'];
             $query->where(function ($q) use ($search) {
-                $q->where('metode_kode', 'like', "%$search%")
+                $q->where('metode_id', 'like', "%$search%")
                     ->orWhere('metode_nama', 'like', "%$search%")
-                    ->orWhere('lokasi_kode', 'like', "%$search%")
+                    ->orWhere('lokasi_id', 'like', "%$search%")
                     ->orWhere('lokasi_nama', 'like', "%$search%")
-                    ->orWhere('hama_kode', 'like', "%$search%")
+                    ->orWhere('hama_id', 'like', "%$search%")
                     ->orWhere('hama_nama', 'like', "%$search%")
                     ->orWhere('tanggal', 'like', "%$search%")
                     ->orWhere('pegawai', 'like', "%$search%")
@@ -92,6 +93,47 @@ class InspeksiController extends Controller
     }
 
     /**
+     * Data Dashboard for datatables
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function dataperbulan(Request $request)
+    {
+
+        $query = Inspeksi::query()
+            ->with(['metode', 'lokasi', 'hama'])
+            ->whereMonth('tanggal', $request->bulan ?? now()->month)
+            ->whereYear('tanggal', now()->year);
+
+        return datatables()
+            ->eloquent($query)
+            ->addIndexColumn()
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
+    /**
+     * Data Dashboard per Metode for datatables
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function datapermetode(Request $request)
+    {
+        $query = Inspeksi::query()
+            ->with(['metode', 'lokasi', 'hama'])
+            ->whereYear('tanggal', now()->year)
+            ->where('metode_id', $request->metode_id); // Added filter for metode_id
+
+        return datatables()
+            ->eloquent($query)
+            ->addIndexColumn()
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -105,12 +147,25 @@ class InspeksiController extends Controller
             'jumlah' => $request->jumlah,
         ]);
 
-        foreach ($request->tindakan as $data) {
+        if ($request->metode_id == 3) {
             Inspeksidetail::create([
                 'inspeksi_id' => $inspeksi->id,
-                'tindakan_id' => $data['id'],
-                'check' => $data['checked'] ?? 0,
+                'bahan_aktif' => $request->bahan_aktif,
+                'jumlah_bait' => $request->jumlah_bait,
+                'kondisi_umpan_utuh_bait' => $request->kondisi_umpan_utuh_bait,
+                'kondisi_umpan_kurang_bait' => $request->kondisi_umpan_kurang_bait,
+                'kondisi_umpan_rusak_bait' => $request->kondisi_umpan_rusak_bait,
+                'tindakan_ganti_bait' => $request->tindakan_ganti_bait,
+                'tindakan_tambah_bait' => $request->tindakan_tambah_bait,
             ]);
+        } else {
+            foreach ($request->tindakan as $data) {
+                Inspeksidetail::create([
+                    'inspeksi_id' => $inspeksi->id,
+                    'tindakan_id' => $data['id'],
+                    'check' => $data['checked'] ?? 0,
+                ]);
+            }
         }
 
         return response()->json([
