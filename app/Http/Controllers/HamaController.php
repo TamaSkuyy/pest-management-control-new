@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Hama;
@@ -13,7 +12,7 @@ class HamaController extends Controller
      */
     public function index()
     {
-        $hama = Hama::paginate(10);
+        $hama   = Hama::paginate(10);
         $metode = Metode::all();
         return view('hama.index', compact('hama', 'metode'));
     }
@@ -38,7 +37,7 @@ class HamaController extends Controller
         $query = Hama::query()->with('metode');
 
         // Search functionality
-        if ($request->has('search') && !empty($request->search['value'])) {
+        if ($request->has('search') && ! empty($request->search['value'])) {
             $search = $request->search['value'];
             $query->where(function ($q) use ($search) {
                 $q->where('hama_kode', 'like', "%$search%")
@@ -55,22 +54,22 @@ class HamaController extends Controller
         // Sorting
         if ($request->has('order')) {
             $orderColumnIndex = $request->order[0]['column'];
-            $orderColumn = $request->columns[$orderColumnIndex]['data'];
-            $orderDir = $request->order[0]['dir'];
+            $orderColumn      = $request->columns[$orderColumnIndex]['data'];
+            $orderDir         = $request->order[0]['dir'];
             $query->orderBy($orderColumn, $orderDir);
         }
 
         // Pagination
-        $start = $request->start ?? 0;
+        $start  = $request->start ?? 0;
         $length = $request->length ?? 10;
-        $data = $query->offset($start)->limit($length)->get();
+        $data   = $query->offset($start)->limit($length)->get();
 
         // Prepare the response
         return response()->json([
-            "draw" => intval($request->draw),
-            "recordsTotal" => $totalRecords,
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalFiltered,
-            "data" => $data,
+            "data"            => $data,
         ]);
     }
 
@@ -82,9 +81,9 @@ class HamaController extends Controller
      */
     public function select2Data(Request $request)
     {
-        $search = $request->input('search');
+        $search       = $request->input('search');
         $metode_value = $request->input('metode_value');
-        $query = Hama::query()
+        $query        = Hama::query()
             ->select('id', 'hama_nama')
             ->where('metode_id', $metode_value)
             ->where(function ($q) use ($search) {
@@ -96,7 +95,31 @@ class HamaController extends Controller
         $formattedData = [];
         foreach ($data as $d) {
             $formattedData[] = [
-                'id' => $d->id,
+                'id'   => $d->id,
+                'text' => $d->hama_nama,
+            ];
+        }
+
+        return response()->json($formattedData);
+    }
+
+    /**
+     * Data for select2 initial
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function select2DataInitial($id)
+    {
+        $query = Hama::query()
+            ->select('id', 'hama_nama')
+            ->where('id', $id);
+
+        $data = $query->get();
+
+        $formattedData = [];
+        foreach ($data as $d) {
+            $formattedData[] = [
+                'id'   => $d->id,
                 'text' => $d->hama_nama,
             ];
         }
@@ -116,7 +139,7 @@ class HamaController extends Controller
         ]);
 
         try {
-            $hama = new Hama;
+            $hama            = new Hama;
             $hama->hama_kode = $request->hama_kode;
             $hama->hama_nama = $request->hama_nama;
             $hama->metode_id = $request->metode_id;

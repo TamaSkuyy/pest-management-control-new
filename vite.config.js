@@ -19,6 +19,8 @@ const pageJsFiles = GetFilesArray('resources/assets/js/*.js');
 
 // Processing Vendor JS Files
 const vendorJsFiles = GetFilesArray('resources/assets/vendor/js/*.js');
+//template-customizer
+// const templateCusomizerFiles = GetFilesArray('resources/assets/vendor/js/_template-customizer/*');
 
 // Processing Libs JS Files
 const LibsJsFiles = GetFilesArray('resources/assets/vendor/libs/**/*.js');

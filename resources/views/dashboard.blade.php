@@ -83,60 +83,48 @@
                                     </div>
                                 </div>
                                 <div class="swiper-slide">
-                                    <!-- Line Area Chart -->
+                                    <!-- Pie Chart -->
                                     <div class="col-12 mb-4">
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between">
                                                 <div>
-                                                    <h5 class="card-title mb-0">Data Inspeksi</h5>
-                                                    <small class="text-muted">Per Metode dan Bulan</small>
+                                                    <h5 class="card-title mb-0">Data Lokasi</h5>
+                                                    <small class="text-muted">Per Metode dan Total</small>
                                                 </div>
-                                                {{-- <div class="dropdown">
-                                                    <button type="button" class="btn dropdown-toggle px-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="bx bx-calendar"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li>
-                                                            <a href="javascript:void(0);"
-                                                                class="dropdown-item d-flex align-items-center">Today</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="javascript:void(0);"
-                                                                class="dropdown-item d-flex align-items-center">Yesterday</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="javascript:void(0);"
-                                                                class="dropdown-item d-flex align-items-center">Last 7
-                                                                Days</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="javascript:void(0);"
-                                                                class="dropdown-item d-flex align-items-center">Last 30
-                                                                Days</a>
-                                                        </li>
-                                                        <li>
-                                                            <hr class="dropdown-divider" />
-                                                        </li>
-                                                        <li>
-                                                            <a href="javascript:void(0);"
-                                                                class="dropdown-item d-flex align-items-center">Current
-                                                                Month</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="javascript:void(0);"
-                                                                class="dropdown-item d-flex align-items-center">Last
-                                                                Month</a>
-                                                        </li>
-                                                    </ul>
-                                                </div> --}}
                                             </div>
                                             <div class="card-body">
-                                                <div id="lineAreaChart"></div>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div id="pieChartPGT"></div>
+                                                    </div>
+                                                    <div class="col-md-4 text-center">
+                                                        <div id="pieChartTotal"></div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div id="pieChartFS"></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- /Line Area Chart -->
+                                    <!-- /Pie Chart -->
+                                </div>
+                                <div class="swiper-slide">
+                                    <!-- Line Chart -->
+                                    <div class="col-12 mb-4">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between">
+                                                <div>
+                                                    <h5 class="card-title mb-0">Data Hama</h5>
+                                                    <small class="text-muted">Per Kondisi Bait</small>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="barChart"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /Line Chart -->
                                 </div>
                             </div>
                             <div class="swiper-pagination"></div>

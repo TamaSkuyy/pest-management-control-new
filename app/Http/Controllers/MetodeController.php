@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -37,7 +36,7 @@ class MetodeController extends Controller
         $query = Metode::query();
 
         // Search functionality
-        if ($request->has('search') && !empty($request->search['value'])) {
+        if ($request->has('search') && ! empty($request->search['value'])) {
             $search = $request->search['value'];
             $query->where(function ($q) use ($search) {
                 $q->where('metode_kode', 'like', "%$search%")
@@ -54,15 +53,15 @@ class MetodeController extends Controller
         // Sorting
         if ($request->has('order')) {
             $orderColumnIndex = $request->order[0]['column'];
-            $orderColumn = $request->columns[$orderColumnIndex]['data'];
-            $orderDir = $request->order[0]['dir'];
+            $orderColumn      = $request->columns[$orderColumnIndex]['data'];
+            $orderDir         = $request->order[0]['dir'];
             $query->orderBy($orderColumn, $orderDir);
         }
 
         // Pagination
-        $start = $request->start ?? 0;
+        $start  = $request->start ?? 0;
         $length = $request->length ?? 10;
-        $data = $query->offset($start)->limit($length)->get();
+        $data   = $query->offset($start)->limit($length)->get();
 
         $data->transform(function ($item) {
             $item->metode_jenis = $item->metode_jenis == 1 ? 'Indoor' : 'Outdoor';
@@ -71,10 +70,10 @@ class MetodeController extends Controller
 
         // Prepare the response
         return response()->json([
-            "draw" => intval($request->draw),
-            "recordsTotal" => $totalRecords,
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalFiltered,
-            "data" => $data,
+            "data"            => $data,
         ]);
     }
 
@@ -87,7 +86,7 @@ class MetodeController extends Controller
     public function select2Data(Request $request)
     {
         $search = $request->input('search');
-        $query = Metode::query()
+        $query  = Metode::query()
             ->select('id', 'metode_nama')
             ->where(function ($q) use ($search) {
                 $q->where('metode_nama', 'like', "%$search%");
@@ -98,7 +97,31 @@ class MetodeController extends Controller
         $formattedData = [];
         foreach ($data as $d) {
             $formattedData[] = [
-                'id' => $d->id,
+                'id'   => $d->id,
+                'text' => $d->metode_nama,
+            ];
+        }
+
+        return response()->json($formattedData);
+    }
+
+    /**
+     * Data for select2 initial
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function select2DataInitial($id)
+    {
+        $query = Metode::query()
+            ->select('id', 'metode_nama')
+            ->where('id', $id);
+
+        $data = $query->get();
+
+        $formattedData = [];
+        foreach ($data as $d) {
+            $formattedData[] = [
+                'id'   => $d->id,
                 'text' => $d->metode_nama,
             ];
         }
@@ -112,15 +135,15 @@ class MetodeController extends Controller
     public function store(Request $request)
     {
         $validate = $request->validate([
-            'metode_kode' => 'required',
-            'metode_nama' => 'required',
+            'metode_kode'  => 'required',
+            'metode_nama'  => 'required',
             'metode_jenis' => 'required|integer',
         ]);
 
         try {
-            $metode = new Metode;
-            $metode->metode_kode = $request->metode_kode;
-            $metode->metode_nama = $request->metode_nama;
+            $metode               = new Metode;
+            $metode->metode_kode  = $request->metode_kode;
+            $metode->metode_nama  = $request->metode_nama;
             $metode->metode_jenis = $request->metode_jenis;
             $metode->save();
         } catch (\Exception $e) {
@@ -144,8 +167,8 @@ class MetodeController extends Controller
     public function update(Request $request, $id)
     {
         $validate = $request->validate([
-            'metode_kode' => 'required',
-            'metode_nama' => 'required',
+            'metode_kode'  => 'required',
+            'metode_nama'  => 'required',
             'metode_jenis' => 'required',
         ]);
 
@@ -156,8 +179,8 @@ class MetodeController extends Controller
 
         try {
             $metode->update([
-                'metode_kode' => $validate['metode_kode'],
-                'metode_nama' => $validate['metode_nama'],
+                'metode_kode'  => $validate['metode_kode'],
+                'metode_nama'  => $validate['metode_nama'],
                 'metode_jenis' => $validate['metode_jenis'],
             ]);
         } catch (\Exception $e) {

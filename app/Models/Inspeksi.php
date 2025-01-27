@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -34,7 +33,6 @@ class Inspeksi extends Model
         'jumlah',
     ];
 
-    
     /**
      * Get the metode that owns the Inspeksi
      *
@@ -63,5 +61,15 @@ class Inspeksi extends Model
     public function hama()
     {
         return $this->belongsTo(Hama::class, 'hama_id', 'id');
+    }
+
+    /**
+     * Get all of the inspeksidetails for the Inspeksi
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function inspeksidetail()
+    {
+        return $this->hasMany(Inspeksidetail::class, 'inspeksi_id', 'id');
     }
 }

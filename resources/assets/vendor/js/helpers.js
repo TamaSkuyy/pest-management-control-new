@@ -3,6 +3,9 @@ const TRANS_EVENTS = ['transitionend', 'webkitTransitionEnd', 'oTransitionEnd']
 const TRANS_PROPERTIES = ['transition', 'MozTransition', 'webkitTransition', 'WebkitTransition', 'OTransition']
 const INLINE_STYLES = `
 .layout-menu-fixed .layout-navbar-full .layout-menu,
+.layout-menu-fixed-offcanvas .layout-navbar-full .layout-menu {
+  top: {navbarHeight}px !important;
+}
 .layout-page {
   padding-top: {navbarHeight}px !important;
 }
@@ -101,16 +104,66 @@ const Helpers = {
   },
 
   // ---
+  // Swipe In Gesture
+  _swipeIn(targetEl, callback) {
+    const { Hammer } = window
+    if (typeof Hammer !== 'undefined' && typeof targetEl === 'string') {
+      // Swipe menu gesture
+      const swipeInElement = document.querySelector(targetEl)
+
+      if (swipeInElement) {
+        const hammerInstance = new Hammer(swipeInElement)
+
+        hammerInstance.on('panright', callback)
+      }
+    }
+  },
+
+  // ---
+  // Swipe Out Gesture
+  _swipeOut(targetEl, callback) {
+    const { Hammer } = window
+    if (typeof Hammer !== 'undefined' && typeof targetEl === 'string') {
+      setTimeout(() => {
+        // Swipe menu gesture
+        const swipeOutElement = document.querySelector(targetEl)
+
+        if (swipeOutElement) {
+          const hammerInstance = new Hammer(swipeOutElement)
+
+          hammerInstance.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 250 })
+          hammerInstance.on('panleft', callback)
+        }
+      }, 500)
+    }
+  },
+
+  // ---
+  // Swipe Out On Overlay Tap
+  _overlayTap(targetEl, callback) {
+    const { Hammer } = window
+
+    if (typeof Hammer !== 'undefined' && typeof targetEl === 'string') {
+      // Swipe out overlay element
+      const swipeOutOverlayElement = document.querySelector(targetEl)
+
+      if (swipeOutOverlayElement) {
+        const hammerInstance = new Hammer(swipeOutOverlayElement)
+
+        hammerInstance.on('tap', callback)
+      }
+    }
+  },
+
+  // ---
   // Add classes
   _addClass(cls, el = this.ROOT_EL) {
-    if (el && el.length !== undefined) {
+    if (el.length !== undefined) {
       // Add classes to multiple elements
       el.forEach(e => {
-        if (e) {
-          cls.split(' ').forEach(c => e.classList.add(c))
-        }
+        cls.split(' ').forEach(c => e.classList.add(c))
       })
-    } else if (el) {
+    } else {
       // Add classes to single element
       cls.split(' ').forEach(c => el.classList.add(c))
     }
@@ -119,14 +172,12 @@ const Helpers = {
   // ---
   // Remove classes
   _removeClass(cls, el = this.ROOT_EL) {
-    if (el && el.length !== undefined) {
+    if (el.length !== undefined) {
       // Remove classes to multiple elements
       el.forEach(e => {
-        if (e) {
-          cls.split(' ').forEach(c => e.classList.remove(c))
-        }
+        cls.split(' ').forEach(c => e.classList.remove(c))
       })
-    } else if (el) {
+    } else {
       // Remove classes to single element
       cls.split(' ').forEach(c => el.classList.remove(c))
     }
@@ -323,6 +374,8 @@ const Helpers = {
           this._redrawLayoutMenu() ? 5 : 0
         )
       }
+    } else {
+      this[collapsed ? '_addClass' : '_removeClass']('layout-menu-collapsed')
     }
   },
 
@@ -419,11 +472,16 @@ const Helpers = {
 
     if (!this._menuMouseEnter) {
       this._menuMouseEnter = () => {
-        if (this.isSmallScreen() || this._hasClass('layout-transitioning')) {
+        if (
+          this.isSmallScreen() ||
+          !this._hasClass('layout-menu-collapsed') ||
+          this.isOffcanvas() ||
+          this._hasClass('layout-transitioning')
+        ) {
           return this._setMenuHoverState(false)
         }
 
-        return this._setMenuHoverState(false)
+        return this._setMenuHoverState(true)
       }
       layoutMenu.addEventListener('mouseenter', this._menuMouseEnter, false)
       layoutMenu.addEventListener('touchstart', this._menuMouseEnter, false)
@@ -483,6 +541,58 @@ const Helpers = {
     this._scrollToActive(animate)
   },
 
+  swipeIn(el, callback) {
+    this._swipeIn(el, callback)
+  },
+
+  swipeOut(el, callback) {
+    this._swipeOut(el, callback)
+  },
+
+  overlayTap(el, callback) {
+    this._overlayTap(el, callback)
+  },
+
+  scrollPageTo(to, duration = 500) {
+    // t = current time
+    // b = start value
+    // c = change in value
+    // d = duration
+    const easeInOutQuad = (t, b, c, d) => {
+      t /= d / 2
+      if (t < 1) return (c / 2) * t * t + b
+      t -= 1
+      return (-c / 2) * (t * (t - 2) - 1) + b
+    }
+
+    const element = document.scrollingElement
+
+    if (typeof to === 'string') {
+      to = document.querySelector(to)
+    }
+    if (typeof to !== 'number') {
+      to = to.getBoundingClientRect().top + element.scrollTop
+    }
+
+    const start = element.scrollTop
+    const change = to - start
+    const startDate = +new Date()
+    // const increment = 20
+
+    const animateScroll = () => {
+      const currentDate = +new Date()
+      const currentTime = currentDate - startDate
+      const val = easeInOutQuad(currentTime, start, change, duration)
+      element.scrollTop = val
+      if (currentTime < duration) {
+        requestAnimationFrame(animateScroll)
+      } else {
+        element.scrollTop = to
+      }
+    }
+    animateScroll()
+  },
+
   // ---
   // Collapse / expand layout
   setCollapsed(collapsed = requiredParam('collapsed'), animate = true) {
@@ -499,7 +609,7 @@ const Helpers = {
       this._bindLayoutAnimationEndEvent(
         () => {
           // Collapse / Expand
-          if (this.isSmallScreen) this._setCollapsed(collapsed)
+          this._setCollapsed(collapsed)
         },
         () => {
           this._removeClass('layout-transitioning')
@@ -571,6 +681,27 @@ const Helpers = {
     return document.querySelector('.content-footer')
   },
 
+  getLayoutContainer() {
+    return document.querySelector('.layout-page')
+  },
+
+  // *******************************************************************************
+  // * Setters
+
+  setNavbarFixed(fixed = requiredParam('fixed')) {
+    this[fixed ? '_addClass' : '_removeClass']('layout-navbar-fixed')
+    this.update()
+  },
+
+  setFooterFixed(fixed = requiredParam('fixed')) {
+    this[fixed ? '_addClass' : '_removeClass']('layout-footer-fixed')
+    this.update()
+  },
+
+  setFlipped(reversed = requiredParam('reversed')) {
+    this[reversed ? '_addClass' : '_removeClass']('layout-menu-flipped')
+  },
+
   // *******************************************************************************
   // * Update
 
@@ -593,6 +724,22 @@ const Helpers = {
     } else if (!enable && this._autoUpdate) {
       this.off('resize.Helpers:autoUpdate')
       this._autoUpdate = false
+    }
+  },
+
+  // Update custom option based on element
+  updateCustomOptionCheck(el) {
+    if (el.checked) {
+      // If custom option element is radio, remove checked from the siblings (closest `.row`)
+      if (el.type === 'radio') {
+        const customRadioOptionList = [].slice.call(el.closest('.row').querySelectorAll('.custom-option'))
+        customRadioOptionList.map(function (customRadioOptionEL) {
+          customRadioOptionEL.closest('.custom-option').classList.remove('checked')
+        })
+      }
+      el.closest('.custom-option').classList.add('checked')
+    } else {
+      el.closest('.custom-option').classList.remove('checked')
     }
   },
 
@@ -631,6 +778,10 @@ const Helpers = {
     return this._hasClass('layout-menu-fixed layout-menu-fixed-offcanvas')
   },
 
+  isOffcanvas() {
+    return this._hasClass('layout-menu-offcanvas layout-menu-fixed-offcanvas')
+  },
+
   isNavbarFixed() {
     return (
       this._hasClass('layout-navbar-fixed') || (!this.isSmallScreen() && this.isFixed() && this.isLayoutNavbarFull())
@@ -641,8 +792,16 @@ const Helpers = {
     return this._hasClass('layout-footer-fixed')
   },
 
+  isFlipped() {
+    return this._hasClass('layout-menu-flipped')
+  },
+
   isLightStyle() {
     return document.documentElement.classList.contains('light-style')
+  },
+
+  isDarkStyle() {
+    return document.documentElement.classList.contains('dark-style')
   },
 
   // *******************************************************************************
@@ -749,6 +908,23 @@ const Helpers = {
     }
   },
 
+  //--
+  // Init custom option check
+  initCustomOptionCheck() {
+    const _this = this
+
+    const custopOptionList = [].slice.call(document.querySelectorAll('.custom-option .form-check-input'))
+    custopOptionList.map(function (customOptionEL) {
+      // Update custom options check on page load
+      _this.updateCustomOptionCheck(customOptionEL)
+
+      // Update custom options check on click
+      customOptionEL.addEventListener('click', e => {
+        _this.updateCustomOptionCheck(customOptionEL)
+      })
+    })
+  },
+
   // ---
   // Init Speech To Text
   initSpeechToText() {
@@ -778,6 +954,25 @@ const Helpers = {
               listening = false
               recognition.stop()
             }
+          })
+        })
+      }
+    }
+  },
+
+  // ---
+  // Init Navbar Dropdown (i.e notification) PerfectScrollbar
+  initNavbarDropdownScrollbar() {
+    const scrollbarContainer = document.querySelectorAll('.navbar-dropdown .scrollable-container')
+    const { PerfectScrollbar } = window
+
+    if (PerfectScrollbar !== undefined) {
+      if (typeof scrollbarContainer !== 'undefined' && scrollbarContainer !== null) {
+        scrollbarContainer.forEach(el => {
+          // eslint-disable-next-line no-new
+          new PerfectScrollbar(el, {
+            wheelPropagation: false,
+            suppressScrollX: true
           })
         })
       }
@@ -831,6 +1026,8 @@ const Helpers = {
   }
 }
 
+window.Helpers = Helpers
+
 // *******************************************************************************
 // * Initialization
 
@@ -851,5 +1048,4 @@ if (typeof window !== 'undefined') {
 }
 
 // ---
-window.Helpers = Helpers
 export { Helpers }

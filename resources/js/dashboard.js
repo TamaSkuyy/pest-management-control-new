@@ -1051,4 +1051,629 @@ import Swiper from 'swiper/bundle';
       });
     });
   }
+
+  // Bar Chart
+  // --------------------------------------------------------------------
+  const barChartEl = document.querySelector('#barChart'),
+    barChartConfig = {
+      chart: {
+        height: 400,
+        type: 'bar',
+        toolbar: {
+          show: false
+        }
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '45%',
+          endingShape: 'rounded',
+          borderRadius: 8, // Added rounded corners
+          distributed: true // Enable color distribution
+        }
+      },
+      grid: {
+        borderColor: borderColor,
+        xaxis: {
+          lines: {
+            show: false
+          }
+        },
+        padding: {
+          top: -20,
+          bottom: -12
+        }
+      },
+      colors: [
+        '#008FFB', // Blue
+        '#00E396', // Green
+        '#FEB019', // Orange
+        '#FF4560', // Red
+        '#775DD0', // Purple
+        '#2B908F', // Teal
+        '#F9CE1D', // Yellow
+        '#FF9800', // Deep Orange
+        '#4CAF50', // Light Green
+        '#9C27B0' // Deep Purple
+      ],
+      dataLabels: {
+        enabled: true,
+        style: {
+          fontSize: '12px',
+          colors: ['#fff'] // White text for better contrast
+        }
+      },
+      series: [],
+      xaxis: {
+        categories: [],
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            colors: labelColor,
+            fontSize: '13px'
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: labelColor,
+            fontSize: '13px'
+          }
+        }
+      },
+      theme: {
+        monochrome: {
+          enabled: false
+        }
+      },
+      states: {
+        hover: {
+          filter: {
+            type: 'darken',
+            value: 0.9
+          }
+        }
+      }
+    };
+
+  if (typeof barChartEl !== undefined && barChartEl !== null) {
+    const barChart = new ApexCharts(barChartEl, barChartConfig);
+    barChart.render();
+
+    $.getJSON('/dashboard/barchart', function (response) {
+      barChart.updateOptions({
+        xaxis: {
+          categories: response.categories
+        },
+        series: response.data
+      });
+    });
+  }
+
+  // Pie Chart
+  // --------------------------------------------------------------------
+  const pieChartEl = document.querySelector('#pieChartTotal'),
+    pieChartConfig = {
+      chart: {
+        height: 400,
+        type: 'pie',
+        toolbar: {
+          show: false
+        }
+      },
+      labels: [],
+      series: [],
+      colors: [
+        '#4CAF50', // Green
+        '#2196F3', // Blue
+        '#FFC107', // Amber
+        '#9C27B0', // Purple
+        '#FF5722', // Deep Orange
+        '#00BCD4', // Cyan
+        '#795548', // Brown
+        '#3F51B5', // Indigo
+        '#FF9800', // Orange
+        '#E91E63', // Pink
+        '#607D8B', // Blue Grey
+        '#8BC34A' // Light Green
+      ],
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          return parseInt(val, 10) + '%';
+        },
+        style: {
+          fontSize: '14px',
+          fontFamily: 'Public Sans',
+          fontWeight: 500,
+          colors: ['#fff']
+        }
+      },
+      legend: {
+        show: true,
+        position: 'bottom',
+        markers: {
+          offsetX: -3,
+          radius: 3,
+          strokeWidth: 0
+        },
+        itemMargin: {
+          vertical: 5,
+          horizontal: 10
+        },
+        labels: {
+          colors: legendColor,
+          useSeriesColors: false
+        }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              name: {
+                fontSize: '2rem',
+                fontFamily: 'Public Sans',
+                fontWeight: 600,
+                color: headingColor
+              },
+              value: {
+                fontSize: '1.2rem',
+                color: legendColor,
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                formatter: function (val) {
+                  return parseInt(val, 10) + '%';
+                }
+              },
+              total: {
+                show: true,
+                fontSize: '1.5rem',
+                color: headingColor,
+                label: 'Total',
+                formatter: function () {
+                  return parseInt(100, 10) + '%';
+                }
+              }
+            }
+          }
+        }
+      },
+      responsive: [
+        {
+          breakpoint: 992,
+          options: {
+            chart: {
+              height: 380
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                colors: legendColor,
+                useSeriesColors: false
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 576,
+          options: {
+            chart: {
+              height: 320
+            },
+            plotOptions: {
+              pie: {
+                donut: {
+                  labels: {
+                    show: true,
+                    name: {
+                      fontSize: '1.5rem'
+                    },
+                    value: {
+                      fontSize: '1rem'
+                    },
+                    total: {
+                      fontSize: '1.5rem'
+                    }
+                  }
+                }
+              }
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                colors: legendColor,
+                useSeriesColors: false
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 420,
+          options: {
+            chart: {
+              height: 280
+            },
+            legend: {
+              show: false
+            }
+          }
+        },
+        {
+          breakpoint: 360,
+          options: {
+            chart: {
+              height: 250
+            },
+            legend: {
+              show: false
+            }
+          }
+        }
+      ]
+    };
+
+  if (typeof pieChartEl !== undefined && pieChartEl !== null) {
+    const pieChart = new ApexCharts(pieChartEl, pieChartConfig);
+    pieChart.render();
+
+    $.getJSON('/dashboard/piecharttotal', function (response) {
+      pieChart.updateOptions({
+        labels: response.labels,
+        series: response.series
+      });
+    });
+  }
+
+  const pieChartPGTEl = document.querySelector('#pieChartPGT'),
+    pieChartPGTConfig = {
+      chart: {
+        height: 400,
+        type: 'pie',
+        toolbar: {
+          show: false
+        }
+      },
+      labels: [],
+      series: [],
+      colors: [
+        '#4CAF50', // Green
+        '#2196F3', // Blue
+        '#FFC107', // Amber
+        '#9C27B0', // Purple
+        '#FF5722', // Deep Orange
+        '#00BCD4', // Cyan
+        '#795548', // Brown
+        '#3F51B5', // Indigo
+        '#FF9800', // Orange
+        '#E91E63', // Pink
+        '#607D8B', // Blue Grey
+        '#8BC34A' // Light Green
+      ],
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          return parseInt(val, 10) + '%';
+        },
+        style: {
+          fontSize: '14px',
+          fontFamily: 'Public Sans',
+          fontWeight: 500,
+          colors: ['#fff']
+        }
+      },
+      legend: {
+        show: true,
+        position: 'bottom',
+        markers: {
+          offsetX: -3,
+          radius: 3,
+          strokeWidth: 0
+        },
+        itemMargin: {
+          vertical: 5,
+          horizontal: 10
+        },
+        labels: {
+          colors: legendColor,
+          useSeriesColors: false
+        }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              name: {
+                fontSize: '2rem',
+                fontFamily: 'Public Sans',
+                fontWeight: 600,
+                color: headingColor
+              },
+              value: {
+                fontSize: '1.2rem',
+                color: legendColor,
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                formatter: function (val) {
+                  return parseInt(val, 10) + '%';
+                }
+              },
+              total: {
+                show: true,
+                fontSize: '1.5rem',
+                color: headingColor,
+                label: 'PGT',
+                formatter: function () {
+                  return parseInt(100, 10) + '%';
+                }
+              }
+            }
+          }
+        }
+      },
+      responsive: [
+        {
+          breakpoint: 992,
+          options: {
+            chart: {
+              height: 380
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                colors: legendColor,
+                useSeriesColors: false
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 576,
+          options: {
+            chart: {
+              height: 320
+            },
+            plotOptions: {
+              pie: {
+                donut: {
+                  labels: {
+                    show: true,
+                    name: {
+                      fontSize: '1.5rem'
+                    },
+                    value: {
+                      fontSize: '1rem'
+                    },
+                    total: {
+                      fontSize: '1.5rem'
+                    }
+                  }
+                }
+              }
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                colors: legendColor,
+                useSeriesColors: false
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 420,
+          options: {
+            chart: {
+              height: 280
+            },
+            legend: {
+              show: false
+            }
+          }
+        },
+        {
+          breakpoint: 360,
+          options: {
+            chart: {
+              height: 250
+            },
+            legend: {
+              show: false
+            }
+          }
+        }
+      ]
+    };
+
+  if (typeof pieChartPGTEl !== undefined && pieChartPGTEl !== null) {
+    const pieChart = new ApexCharts(pieChartPGTEl, pieChartPGTConfig);
+    pieChart.render();
+
+    $.getJSON('/dashboard/piechartpgt', function (response) {
+      pieChart.updateOptions({
+        labels: response.labels,
+        series: response.series
+      });
+    });
+  }
+
+  const pieChartFSEl = document.querySelector('#pieChartFS'),
+    pieChartFSConfig = {
+      chart: {
+        height: 400,
+        type: 'pie',
+        toolbar: {
+          show: false
+        }
+      },
+      labels: [],
+      series: [],
+      colors: [
+        '#4CAF50', // Green
+        '#2196F3', // Blue
+        '#FFC107', // Amber
+        '#9C27B0', // Purple
+        '#FF5722', // Deep Orange
+        '#00BCD4', // Cyan
+        '#795548', // Brown
+        '#3F51B5', // Indigo
+        '#FF9800', // Orange
+        '#E91E63', // Pink
+        '#607D8B', // Blue Grey
+        '#8BC34A' // Light Green
+      ],
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          return parseInt(val, 10) + '%';
+        },
+        style: {
+          fontSize: '14px',
+          fontFamily: 'Public Sans',
+          fontWeight: 500,
+          colors: ['#fff']
+        }
+      },
+      legend: {
+        show: true,
+        position: 'bottom',
+        markers: {
+          offsetX: -3,
+          radius: 3,
+          strokeWidth: 0
+        },
+        itemMargin: {
+          vertical: 5,
+          horizontal: 10
+        },
+        labels: {
+          colors: legendColor,
+          useSeriesColors: false
+        }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              name: {
+                fontSize: '2rem',
+                fontFamily: 'Public Sans',
+                fontWeight: 600,
+                color: headingColor
+              },
+              value: {
+                fontSize: '1.2rem',
+                color: legendColor,
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                formatter: function (val) {
+                  return parseInt(val, 10) + '%';
+                }
+              },
+              total: {
+                show: true,
+                fontSize: '1.5rem',
+                color: headingColor,
+                label: 'FS',
+                formatter: function () {
+                  return parseInt(100, 10) + '%';
+                }
+              }
+            }
+          }
+        }
+      },
+      responsive: [
+        {
+          breakpoint: 992,
+          options: {
+            chart: {
+              height: 380
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                colors: legendColor,
+                useSeriesColors: false
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 576,
+          options: {
+            chart: {
+              height: 320
+            },
+            plotOptions: {
+              pie: {
+                donut: {
+                  labels: {
+                    show: true,
+                    name: {
+                      fontSize: '1.5rem'
+                    },
+                    value: {
+                      fontSize: '1rem'
+                    },
+                    total: {
+                      fontSize: '1.5rem'
+                    }
+                  }
+                }
+              }
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                colors: legendColor,
+                useSeriesColors: false
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 420,
+          options: {
+            chart: {
+              height: 280
+            },
+            legend: {
+              show: false
+            }
+          }
+        },
+        {
+          breakpoint: 360,
+          options: {
+            chart: {
+              height: 250
+            },
+            legend: {
+              show: false
+            }
+          }
+        }
+      ]
+    };
+
+  if (typeof pieChartFSEl !== undefined && pieChartFSEl !== null) {
+    const pieChart = new ApexCharts(pieChartFSEl, pieChartFSConfig);
+    pieChart.render();
+
+    $.getJSON('/dashboard/piechartfs', function (response) {
+      pieChart.updateOptions({
+        labels: response.labels,
+        series: response.series
+      });
+    });
+  }
 })();

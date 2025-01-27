@@ -2,19 +2,23 @@
 
     <!-- ! Hide app brand if navbar-full -->
     <div class="app-brand demo">
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('assets/img/icons/Logo_Orangtua.png') }}" alt="Logo" class="app-brand-logo"
-                width="32">
-            <img src="{{ asset('assets/img/icons/logo_k3.png') }}" alt="Logo 2" class="app-brand-logo ms-2"
-                width="32">
-            <a href="{{ url('/dashboard') }}" class="ms-2">
-                <span class="app-brand-text demo text-body fw-bolder">PMC</span>
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url('/dashboard') }}" class="d-flex align-items-center justify-content-center">
+                    <img src="{{ asset('assets/img/icons/Logo_Orangtua.png') }}" alt="Primary Logo" class="app-brand-logo"
+                        style="height: 40px; width: auto;">
+                    <img src="{{ asset('assets/img/icons/logo_k3.png') }}" alt="Secondary Logo" class="app-brand-logo"
+                        style="height: 40px; width: auto;">
+                    <span class="app-brand-text ms-2 text-primary fw-bold text-uppercase">
+                        {{-- Management System --}}
+                    </span>
+                </a>
+            </div>
+
+            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-3 d-block d-xl-none">
+                <i class="bx bx-chevron-left bx-sm align-middle"></i>
             </a>
         </div>
-
-        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-            <i class="bx bx-chevron-left bx-sm d-flex align-items-center justify-content-center"></i>
-        </a>
     </div>
 
     <div class="menu-inner-shadow"></div>

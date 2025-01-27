@@ -48,6 +48,7 @@ Route::prefix('master')->name('master.')->middleware('auth')->group(function () 
     Route::get('/metode/data', [MetodeController::class, 'data'])->name('metode.data');
     //--select2
     Route::get('/metode/select2', [MetodeController::class, 'select2Data'])->name('metode.select2');
+    Route::get('/metode/select2/initial/{id}', [MetodeController::class, 'select2DataInitial'])->name('metode.select2-initial');
 
     //lokasi
     Route::get('/lokasi', [LokasiController::class, 'index'])->name('lokasi.index');
@@ -59,6 +60,7 @@ Route::prefix('master')->name('master.')->middleware('auth')->group(function () 
     Route::get('/lokasi/data', [LokasiController::class, 'data'])->name('lokasi.data');
     //--select2
     Route::get('/lokasi/select2', [LokasiController::class, 'select2Data'])->name('lokasi.select2');
+    Route::get('/lokasi/select2/initial/{id}', [LokasiController::class, 'select2DataInitial'])->name('lokasi.select2-initial');
 
     //hama
     Route::get('/hama', [HamaController::class, 'index'])->name('hama.index');
@@ -70,6 +72,7 @@ Route::prefix('master')->name('master.')->middleware('auth')->group(function () 
     Route::get('/hama/data', [HamaController::class, 'data'])->name('hama.data');
     //--select2
     Route::get('/hama/select2', [HamaController::class, 'select2Data'])->name('hama.select2');
+    Route::get('/hama/select2/initial/{id}', [HamaController::class, 'select2DataInitial'])->name('hama.select2-initial');
 
     //tindakan
     Route::get('/tindakan', [TindakanController::class, 'index'])->name('tindakan.index');
@@ -94,6 +97,7 @@ Route::middleware('auth')->group(function () {
     //tindakan
     Route::get('/inspeksi', [InspeksiController::class, 'index'])->name('inspeksi.index');
     Route::get('/inspeksi/create', [InspeksiController::class, 'create'])->name('inspeksi.create');
+    Route::get('/inspeksi/edit/{id}', [InspeksiController::class, 'edit'])->name('inspeksi.edit');
     Route::post('/inspeksi/store', [InspeksiController::class, 'store'])->name('inspeksi.store');
     Route::patch('/inspeksi/{id}', [InspeksiController::class, 'update'])->name('inspeksi.update');
     Route::delete('/inspeksi/{id}', [InspeksiController::class, 'destroy'])->name('inspeksi.destroy');
@@ -101,11 +105,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/inspeksi/data', [InspeksiController::class, 'data'])->name('inspeksi.data');
     Route::get('/inspeksi/dataperbulan', [InspeksiController::class, 'dataperbulan'])->name('inspeksi.dataperbulan');
     Route::get('/inspeksi/datapermetode', [InspeksiController::class, 'datapermetode'])->name('inspeksi.datapermetode');
+    Route::get('/inspeksi/datainspeksidetail/{id}', [InspeksiController::class, 'dataInputTable'])->name('inspeksi.datainspeksidetail');
 
     //dashboard
     Route::get('/dashboard/linechart', [DashboardController::class, 'linechart'])->name('dashboard.linechart');
     Route::get('/dashboard/areachart', [DashboardController::class, 'areachart'])->name('dashboard.areachart');
     Route::get('/dashboard/donutchart', [DashboardController::class, 'donutchart'])->name('dashboard.donutchart');
+    Route::get('/dashboard/barchart', [DashboardController::class, 'barchart'])->name('dashboard.barchart');
+    Route::get('/dashboard/piecharttotal', [DashboardController::class, 'piecharttotal'])->name('dashboard.piecharttotal');
+    Route::get('/dashboard/piechartpgt', [DashboardController::class, 'piechartpgt'])->name('dashboard.piechartpgt');
+    Route::get('/dashboard/piechartfs', [DashboardController::class, 'piechartfs'])->name('dashboard.piechartfs');
 
 });
 

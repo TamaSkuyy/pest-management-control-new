@@ -76,5 +76,6 @@
             </div>
             <!-- /Register -->
         </div>
+
     </div>
 @endsection

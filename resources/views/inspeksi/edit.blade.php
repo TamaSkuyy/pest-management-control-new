@@ -84,6 +84,7 @@
                         }
                     });
                 });
+
             }
 
             var select2_hama = $('.select2_hama');
@@ -113,9 +114,10 @@
                         }
                     }).on('change', function() {
                         let hamaId = $(this).val();
-                        loadTindakan(hamaId);
+                        // loadTindakan(hamaId);
                     });
                 });
+
             }
 
             // Wizard Validation
@@ -264,7 +266,7 @@
                             })
                             .on('change.select2', function() {
                                 // Revalidate the color field when an option is chosen
-                                FormValidation1.revalidateField('metode_id');
+                                // FormValidation1.revalidateField('metode_id');
                                 const selectedValue = this.value;
 
                                 if (selectedValue != 3) {
@@ -310,7 +312,7 @@
                             })
                             .on('change.select2', function() {
                                 // Revalidate the color field when an option is chosen
-                                FormValidation1.revalidateField('lokasi_id');
+                                // FormValidation1.revalidateField('lokasi_id');
                             });
                     });
                 }
@@ -344,9 +346,9 @@
                             })
                     }).on('change.select2', function() {
                         let hamaId = $(this).val();
-                        loadTindakan(hamaId);
+                        // loadTindakan(hamaId);
                         // Revalidate the color field when an option is chosen
-                        FormValidation1.revalidateField('hama_id');
+                        // FormValidation1.revalidateField('hama_id');
                     });
                 }
 
@@ -389,26 +391,33 @@
                         data: 'id'
                     },
                     {
+                        data: 'tindakan_id'
+                    },
+                    {
                         data: 'tindakan_nama'
                     },
                     {
-                        data: null,
-                        render: function(data, type, row) {
-                            return `
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" value="${row.id}" id="tindakan-${row.id}">
-                                    <label class="form-check-label" for="tindakan-${row.id}">Pilih</label>
-                                </div>
-                            `;
-                        }
+                        data: 'tindakan_status'
                     }
+
+                    // {
+                    //     data: null,
+                    //     render: function(data, type, row) {
+                    //         return `
+                //             <div class="form-check form-check-inline">
+                //                 <input class="form-check-input" type="checkbox" value="${row.id}" id="tindakan-${row.id}">
+                //                 <label class="form-check-label" for="tindakan-${row.id}">Pilih</label>
+                //             </div>
+                //         `;
+                    //     }
+                    // }
                 ],
                 pageLength: -1,
                 paging: false,
                 info: false,
                 footer: false,
                 columnDefs: [{
-                    targets: 0,
+                    targets: [0, 1],
                     visible: false
                 }],
 
@@ -417,22 +426,41 @@
             // Fungsi untuk memuat data
             function loadTindakan(hamaId) {
                 $.ajax({
-                    url: hamaId ? `/master/tindakan/data-input-table/${hamaId}` :
-                        '/master/tindakan/data-input-table',
+                    url: '/inspeksi/datainspeksidetail/' + {{ $inspeksi->id }},
                     type: 'GET',
                     success: function(data) {
                         table.clear();
-                        table.rows.add(data);
+                        data.data.forEach(function(item) {
+                            // Set checkbox checked based on tindakan_status
+                            let isChecked = item.check == 1 ? ' checked' : '';
+                            let isCheck = ' checked';
+
+                            table.row.add({
+                                'id': item.id,
+                                'tindakan_id': item.tindakan_id,
+                                'tindakan_nama': item.tindakan.tindakan_nama,
+                                'tindakan_status': `<div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" value="${item.id}"
+                                    id="tindakan-${item.id}" ${isCheck}>
+                                    <label class="form-check-label" for="tindakan-${item.id}">Pilih</label>
+                                  </div>`
+                            });
+                        });
                         table.draw();
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error:', error);
+                        console.error('Error loading tindakan data:', error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Gagal memuat data tindakan',
+                            icon: 'error'
+                        });
                     }
                 });
             }
 
             // Load initial data
-            loadTindakan();
+            // loadTindakan();
 
             // Event simpan pada button btsimpan
             $('#btsimpan').on('click', function() {
@@ -489,6 +517,40 @@
                     }
                 });
             });
+
+            // Set initial values for Select2 dropdowns
+            var option_metode = new Option('{{ $inspeksi->metode->metode_nama }}', '{{ $inspeksi->metode_id }}',
+                true, true);
+            select2_metode.append(option_metode).trigger('change');
+
+            var option_lokasi = new Option('{{ $inspeksi->lokasi->lokasi_nama }}', '{{ $inspeksi->lokasi_id }}',
+                true, true);
+            select2_lokasi.append(option_lokasi).trigger('change');
+
+            var option_hama = new Option('{{ $inspeksi->hama->hama_nama ?? '' }}', '{{ $inspeksi->hama_id ?? '' }}',
+                true, true);
+            select2_hama.append(option_hama).trigger('change');
+
+            // Set initial values for input fields
+
+            @if ($inspeksi->metode_id == 3)
+                $('#tindakan-rbt-div').show();
+                $('#tindakan-table-div').hide();
+                $('#bahan_aktif').val('{{ $inspeksi->inspeksidetail[0]->bahan_aktif }}');
+                $('#jumlah_bait').val('{{ $inspeksi->inspeksidetail[0]->jumlah_bait }}');
+                $('#kondisi_umpan_utuh_bait').val('{{ $inspeksi->inspeksidetail[0]->kondisi_umpan_utuh_bait }}');
+                $('#kondisi_umpan_kurang_bait').val(
+                    '{{ $inspeksi->inspeksidetail[0]->kondisi_umpan_kurang_bait }}');
+                $('#kondisi_umpan_rusak_bait').val('{{ $inspeksi->inspeksidetail[0]->kondisi_umpan_rusak_bait }}');
+                $('#tindakan_ganti_bait').val('{{ $inspeksi->inspeksidetail[0]->tindakan_ganti_bait }}');
+                $('#tindakan_tambah_bait').val('{{ $inspeksi->inspeksidetail[0]->tindakan_tambah_bait }}');
+                $('#kondisi_rbs').val('{{ $inspeksi->inspeksidetail[0]->kondisi_rbs }}');
+                $('#tindakan_rbs').val('{{ $inspeksi->inspeksidetail[0]->tindakan_rbs }}');
+            @else
+                $('#tindakan-rbt-div').hide();
+                $('#tindakan-table-div').show();
+                loadTindakan('{{ $inspeksi->hama_id }}');
+            @endif
         });
     </script>
 @endsection
@@ -496,7 +558,7 @@
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Inspeksi /</span> Tambah Data</h4>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Inspeksi /</span> Update Data</h4>
 
         <!-- Default -->
         <div class="row">
@@ -535,6 +597,7 @@
                                     <h6 class="mb-0">Inspeksi</h6>
                                     <small>Data Inspeksi.</small>
                                 </div>
+                                <input type="hidden" name="id" id="id" value="{{ $inspeksi->id }}" />
                                 <div class="row g-3">
                                     <div class="col-sm-4">
                                         <label class="form-label" for="metode_id">Metode</label>
@@ -554,17 +617,17 @@
                                     <div class="col-sm-4">
                                         <label class="form-label" for="tanggal">Tanggal</label>
                                         <input type="date" name="tanggal" id="tanggal" class="form-control"
-                                            value="{{ date('Y-m-d') }}" placeholder="" />
+                                            value="{{ $inspeksi->tanggal ?? date('Y-m-d') }}" placeholder="" />
                                     </div>
                                     <div class="col-sm-4">
                                         <label class="form-label" for="pegawai">Pegawai</label>
                                         <input type="text" name="pegawai" id="pegawai" class="form-control"
-                                            placeholder="Nama Pegawai" />
+                                            placeholder="Nama Pegawai" value="{{ $inspeksi->pegawai ?? '' }}" />
                                     </div>
                                     <div class="col-sm-4 form-password-toggle">
                                         <label class="form-label" for="jumlah">Jumlah</label>
                                         <input type="number" id="jumlah" name="jumlah" class="form-control"
-                                            min="0" />
+                                            min="0" value="{{ $inspeksi->jumlah ?? 0 }}" />
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-label-secondary btn-prev" disabled>
@@ -656,6 +719,7 @@
                                             <table id="tindakan-table" class="table table-bordered">
                                                 <thead>
                                                     <tr>
+                                                        <th>id</th>
                                                         <th>Tindakan_ID</th>
                                                         <th>Tindakan</th>
                                                         <th>Checklist</th>

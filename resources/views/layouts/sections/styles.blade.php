@@ -12,7 +12,7 @@
 @vite(['resources/assets/vendor/scss/core.scss', 'resources/assets/vendor/scss/theme-default.scss', 'resources/assets/css/demo.css'])
 
 <!-- Vendor Styles -->
-@vite(['resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.scss', 'resources/assets/vendor/libs/bs-stepper/bs-stepper.scss'])
+@vite(['resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.scss', 'resources/assets/vendor/libs/typeahead-js/typeahead.scss', 'resources/assets/vendor/libs/bs-stepper/bs-stepper.scss'])
 @yield('vendor-style')
 
 <!-- Page Styles -->

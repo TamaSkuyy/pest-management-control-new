@@ -28,68 +28,70 @@ window.config = {
   }
 };
 
-// let assetsPath = document.documentElement.getAttribute('data-assets-path'),
-//   templateName = document.documentElement.getAttribute('data-template'),
-//   rtlSupport = false; // set true for rtl support (rtl + ltr), false for ltr only.
+let assetsPath = document.documentElement.getAttribute('data-assets-path'),
+  templateName = document.documentElement.getAttribute('data-template'),
+  rtlSupport = false; // set true for rtl support (rtl + ltr), false for ltr only.
 
-// /**
-//  * TemplateCustomizer
-//  * ! You must use(include) template-customizer.js to use TemplateCustomizer settings
-//  * -----------------------------------------------------------------------------------------------
-//  */
+window.templateName = templateName;
 
-// // To use more themes, just push it to THEMES object.
+/**
+ * TemplateCustomizer
+ * ! You must use(include) template-customizer.js to use TemplateCustomizer settings
+ * -----------------------------------------------------------------------------------------------
+ */
 
-// /* TemplateCustomizer.THEMES.push({
-//   name: 'theme-raspberry',
-//   title: 'Raspberry'
-// }); */
+// To use more themes, just push it to THEMES object.
 
-// // To add more languages, just push it to LANGUAGES object.
-// /*
-// TemplateCustomizer.LANGUAGES.fr = { ... };
-// */
+/* TemplateCustomizer.THEMES.push({
+  name: 'theme-raspberry',
+  title: 'Raspberry'
+}); */
 
-// /**
-//  * TemplateCustomizer settings
-//  * -------------------------------------------------------------------------------------
-//  * cssPath: Core CSS file path
-//  * themesPath: Theme CSS file path
-//  * displayCustomizer: true(Show customizer), false(Hide customizer)
-//  * lang: To set default language, Add more langues and set default. Fallback language is 'en'
-//  * controls: [ 'rtl','style','layoutType','showDropdownOnHover','layoutNavbarFixed','layoutFooterFixed','themes'] | Show/Hide customizer controls
-//  * defaultTheme: 0(Default), 1(Semi Dark), 2(Bordered)
-//  * defaultStyle: 'light', 'dark' (Mode)
-//  * defaultTextDir: 'ltr', 'rtl' (rtlSupport must be true for rtl mode)
-//  * defaultLayoutType: 'static', 'fixed'
-//  * defaultMenuCollapsed: true, false
-//  * defaultNavbarFixed: true, false
-//  * defaultFooterFixed: true, false
-//  * defaultShowDropdownOnHover : true, false (for horizontal layout only)
-//  */
+// To add more languages, just push it to LANGUAGES object.
+/*
+TemplateCustomizer.LANGUAGES.fr = { ... };
+*/
 
-// if (typeof TemplateCustomizer !== 'undefined') {
-//   window.templateCustomizer = new TemplateCustomizer({
-//     cssPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
-//     themesPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
-//     displayCustomizer: true,
-//     // lang: 'fr',
-//     // defaultTheme: 2,
-//     // defaultStyle: 'light',
-//     // defaultTextDir: 'ltr',
-//     // defaultLayoutType: 'fixed',
-//     // defaultMenuCollapsed: true,
-//     // defaultNavbarFixed: true,
-//     // defaultFooterFixed: false
-//     defaultShowDropdownOnHover: true
-//     // controls: [
-//     //   'rtl',
-//     //   'style',
-//     //   'layoutType',
-//     //   'showDropdownOnHover',
-//     //   'layoutNavbarFixed',
-//     //   'layoutFooterFixed',
-//     //   'themes'
-//     // ],
-//   });
-// }
+/**
+ * TemplateCustomizer settings
+ * -------------------------------------------------------------------------------------
+ * cssPath: Core CSS file path
+ * themesPath: Theme CSS file path
+ * displayCustomizer: true(Show customizer), false(Hide customizer)
+ * lang: To set default language, Add more langues and set default. Fallback language is 'en'
+ * controls: [ 'rtl','style','layoutType','showDropdownOnHover','layoutNavbarFixed','layoutFooterFixed','themes'] | Show/Hide customizer controls
+ * defaultTheme: 0(Default), 1(Semi Dark), 2(Bordered)
+ * defaultStyle: 'light', 'dark' (Mode)
+ * defaultTextDir: 'ltr', 'rtl' (rtlSupport must be true for rtl mode)
+ * defaultLayoutType: 'static', 'fixed'
+ * defaultMenuCollapsed: true, false
+ * defaultNavbarFixed: true, false
+ * defaultFooterFixed: true, false
+ * defaultShowDropdownOnHover : true, false (for horizontal layout only)
+ */
+
+if (typeof TemplateCustomizer !== 'undefined') {
+  window.templateCustomizer = new TemplateCustomizer({
+    cssPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
+    themesPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
+    displayCustomizer: true,
+    // lang: 'fr',
+    // defaultTheme: 2,
+    // defaultStyle: 'light',
+    // defaultTextDir: 'ltr',
+    // defaultLayoutType: 'fixed',
+    // defaultMenuCollapsed: true,
+    // defaultNavbarFixed: true,
+    // defaultFooterFixed: false
+    defaultShowDropdownOnHover: true
+    // controls: [
+    //   'rtl',
+    //   'style',
+    //   'layoutType',
+    //   'showDropdownOnHover',
+    //   'layoutNavbarFixed',
+    //   'layoutFooterFixed',
+    //   'themes'
+    // ],
+  });
+}

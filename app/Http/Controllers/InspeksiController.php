@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Hama;
@@ -18,10 +17,10 @@ class InspeksiController extends Controller
      */
     public function index()
     {
-        $inspeksi = Inspeksi::all();
-        $metode = Metode::all();
-        $lokasi = Lokasi::all();
-        $hama = Hama::all();
+        $inspeksi  = Inspeksi::all();
+        $metode    = Metode::all();
+        $lokasi    = Lokasi::all();
+        $hama      = Hama::all();
         $tindakans = Tindakan::all();
         return view('inspeksi.index', compact('inspeksi', 'metode', 'lokasi', 'hama', 'tindakans'));
     }
@@ -48,7 +47,7 @@ class InspeksiController extends Controller
         $query = Inspeksi::query()->with(['metode', 'lokasi', 'hama']);
 
         // Search functionality
-        if ($request->has('search') && !empty($request->search['value'])) {
+        if ($request->has('search') && ! empty($request->search['value'])) {
             $search = $request->search['value'];
             $query->where(function ($q) use ($search) {
                 $q->where('metode_id', 'like', "%$search%")
@@ -73,22 +72,22 @@ class InspeksiController extends Controller
         // Sorting
         if ($request->has('order')) {
             $orderColumnIndex = $request->order[0]['column'];
-            $orderColumn = $request->columns[$orderColumnIndex]['data'];
-            $orderDir = $request->order[0]['dir'];
+            $orderColumn      = $request->columns[$orderColumnIndex]['data'];
+            $orderDir         = $request->order[0]['dir'];
             $query->orderBy($orderColumn, $orderDir);
         }
 
         // Pagination
-        $start = $request->start ?? 0;
+        $start  = $request->start ?? 0;
         $length = $request->length ?? 10;
-        $data = $query->offset($start)->limit($length)->get();
+        $data   = $query->offset($start)->limit($length)->get();
 
         // Prepare the response
         return response()->json([
-            "draw" => intval($request->draw),
-            "recordsTotal" => $totalRecords,
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalFiltered,
-            "data" => $data,
+            "data"            => $data,
         ]);
     }
 
@@ -133,45 +132,70 @@ class InspeksiController extends Controller
             ->make(true);
     }
 
+    public function dataInputTable($id)
+    {
+        $query = Inspeksidetail::query()->with('tindakan')->where('id', $id);
+
+        return datatables()
+            ->eloquent($query)
+            ->addIndexColumn()
+            ->addColumn('checked', function ($data) {
+                return '<input type="checkbox" name="tindakan[' . $data->id . '][checked]" value="1">';
+            })
+            ->rawColumns(['checked'])
+            ->make(true);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $inspeksi = Inspeksi::create([
-            'metode_id' => $request->metode_id,
-            'lokasi_id' => $request->lokasi_id,
-            'hama_id' => $request->hama_id,
-            'tanggal' => $request->tanggal,
-            'pegawai' => $request->pegawai,
-            'jumlah' => $request->jumlah,
-        ]);
-
-        if ($request->metode_id == 3) {
-            Inspeksidetail::create([
-                'inspeksi_id' => $inspeksi->id,
-                'bahan_aktif' => $request->bahan_aktif,
-                'jumlah_bait' => $request->jumlah_bait,
-                'kondisi_umpan_utuh_bait' => $request->kondisi_umpan_utuh_bait,
-                'kondisi_umpan_kurang_bait' => $request->kondisi_umpan_kurang_bait,
-                'kondisi_umpan_rusak_bait' => $request->kondisi_umpan_rusak_bait,
-                'tindakan_ganti_bait' => $request->tindakan_ganti_bait,
-                'tindakan_tambah_bait' => $request->tindakan_tambah_bait,
+        try {
+            $inspeksi = Inspeksi::create([
+                'metode_id' => $request->metode_id,
+                'lokasi_id' => $request->lokasi_id,
+                'hama_id'   => $request->hama_id,
+                'tanggal'   => $request->tanggal,
+                'pegawai'   => $request->pegawai,
+                'jumlah'    => $request->jumlah,
             ]);
-        } else {
-            foreach ($request->tindakan as $data) {
-                Inspeksidetail::create([
-                    'inspeksi_id' => $inspeksi->id,
-                    'tindakan_id' => $data['id'],
-                    'check' => $data['checked'] ?? 0,
-                ]);
-            }
-        }
 
-        return response()->json([
-            'message' => 'Data inspeksi berhasil disimpan.',
-            'data' => $inspeksi,
-        ]);
+            if ($request->metode_id == 3) {
+                Inspeksidetail::create([
+                    'inspeksi_id'               => $inspeksi->id,
+                    'bahan_aktif'               => $request->bahan_aktif,
+                    'jumlah_bait'               => $request->jumlah_bait,
+                    'kondisi_umpan_utuh_bait'   => $request->kondisi_umpan_utuh_bait,
+                    'kondisi_umpan_kurang_bait' => $request->kondisi_umpan_kurang_bait,
+                    'kondisi_umpan_rusak_bait'  => $request->kondisi_umpan_rusak_bait,
+                    'tindakan_ganti_bait'       => $request->tindakan_ganti_bait,
+                    'tindakan_tambah_bait'      => $request->tindakan_tambah_bait,
+                    'kondisi_rbs'               => $request->kondisi_rbs,
+                    'tindakan_rbs'              => $request->tindakan_rbs,
+                ]);
+            } else {
+                foreach ($request->tindakan as $data) {
+                    Inspeksidetail::create([
+                        'inspeksi_id' => $inspeksi->id,
+                        'tindakan_id' => $data['id'],
+                        'check'       => $data['checked'] ?? 0,
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data inspeksi berhasil disimpan.',
+                'data'    => $inspeksi,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data inspeksi: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -185,9 +209,17 @@ class InspeksiController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Inspeksi $inspeksi)
+    public function edit($id)
     {
-        //
+        $inspeksi = Inspeksi::with(['inspeksidetail.tindakan', 'hama', 'lokasi', 'metode'])->findOrFail($id);
+        if ($inspeksi === null) {
+            return response()->json(['status' => 'error', 'message' => 'Inspeksi tidak ditemukan']);
+        }
+        $tindakans = Tindakan::all();
+
+        // return $inspeksi;
+
+        return view('inspeksi.edit', compact('inspeksi', 'tindakans'));
     }
 
     /**

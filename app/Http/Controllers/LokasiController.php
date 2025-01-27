@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -37,7 +36,7 @@ class LokasiController extends Controller
         $query = Lokasi::query();
 
         // Search functionality
-        if ($request->has('search') && !empty($request->search['value'])) {
+        if ($request->has('search') && ! empty($request->search['value'])) {
             $search = $request->search['value'];
             $query->where(function ($q) use ($search) {
                 $q->where('lokasi_kode', 'like', "%$search%")
@@ -54,15 +53,15 @@ class LokasiController extends Controller
         // Sorting
         if ($request->has('order')) {
             $orderColumnIndex = $request->order[0]['column'];
-            $orderColumn = $request->columns[$orderColumnIndex]['data'];
-            $orderDir = $request->order[0]['dir'];
+            $orderColumn      = $request->columns[$orderColumnIndex]['data'];
+            $orderDir         = $request->order[0]['dir'];
             $query->orderBy($orderColumn, $orderDir);
         }
 
         // Pagination
-        $start = $request->start ?? 0;
+        $start  = $request->start ?? 0;
         $length = $request->length ?? 10;
-        $data = $query->offset($start)->limit($length)->get();
+        $data   = $query->offset($start)->limit($length)->get();
 
         $data->transform(function ($item) {
             $item->lokasi_jenis = $item->lokasi_jenis == 1 ? 'Indoor' : 'Outdoor';
@@ -71,10 +70,10 @@ class LokasiController extends Controller
 
         // Prepare the response
         return response()->json([
-            "draw" => intval($request->draw),
-            "recordsTotal" => $totalRecords,
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalFiltered,
-            "data" => $data,
+            "data"            => $data,
         ]);
     }
 
@@ -86,9 +85,9 @@ class LokasiController extends Controller
      */
     public function select2Data(Request $request)
     {
-        $search = $request->input('search');
+        $search       = $request->input('search');
         $metode_value = $request->input('metode_value');
-        $query = Lokasi::query()
+        $query        = Lokasi::query()
             ->select('id', 'lokasi_nama')
         // ->where('metode_id', $metode_value)
             ->where(function ($q) use ($search) {
@@ -100,7 +99,31 @@ class LokasiController extends Controller
         $formattedData = [];
         foreach ($data as $d) {
             $formattedData[] = [
-                'id' => $d->id,
+                'id'   => $d->id,
+                'text' => $d->lokasi_nama,
+            ];
+        }
+
+        return response()->json($formattedData);
+    }
+
+    /**
+     * Data for select2 initial
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function select2DataInitial($id)
+    {
+        $query = Lokasi::query()
+            ->select('id', 'lokasi_nama')
+            ->where('id', $id);
+
+        $data = $query->get();
+
+        $formattedData = [];
+        foreach ($data as $d) {
+            $formattedData[] = [
+                'id'   => $d->id,
                 'text' => $d->lokasi_nama,
             ];
         }
@@ -114,15 +137,15 @@ class LokasiController extends Controller
     public function store(Request $request)
     {
         $validate = $request->validate([
-            'lokasi_kode' => 'required',
-            'lokasi_nama' => 'required',
+            'lokasi_kode'  => 'required',
+            'lokasi_nama'  => 'required',
             'lokasi_jenis' => 'required|integer',
         ]);
 
         try {
-            $lokasi = new Lokasi;
-            $lokasi->lokasi_kode = $request->lokasi_kode;
-            $lokasi->lokasi_nama = $request->lokasi_nama;
+            $lokasi               = new Lokasi;
+            $lokasi->lokasi_kode  = $request->lokasi_kode;
+            $lokasi->lokasi_nama  = $request->lokasi_nama;
             $lokasi->lokasi_jenis = $request->lokasi_jenis;
             $lokasi->save();
         } catch (\Exception $e) {
@@ -154,8 +177,8 @@ class LokasiController extends Controller
     public function update(Request $request, $id)
     {
         $validate = $request->validate([
-            'lokasi_kode' => 'required',
-            'lokasi_nama' => 'required',
+            'lokasi_kode'  => 'required',
+            'lokasi_nama'  => 'required',
             'lokasi_jenis' => 'required',
         ]);
 
@@ -166,8 +189,8 @@ class LokasiController extends Controller
 
         try {
             $lokasi->update([
-                'lokasi_kode' => $validate['lokasi_kode'],
-                'lokasi_nama' => $validate['lokasi_nama'],
+                'lokasi_kode'  => $validate['lokasi_kode'],
+                'lokasi_nama'  => $validate['lokasi_nama'],
                 'lokasi_jenis' => $validate['lokasi_jenis'],
             ]);
         } catch (\Exception $e) {

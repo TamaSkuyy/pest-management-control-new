@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +28,15 @@ class Inspeksidetail extends Model
         'inspeksi_id',
         'tindakan_id',
         'check',
+        'bahan_aktif',
+        'jumlah_bait',
+        'kondisi_umpan_utuh_bait',
+        'kondisi_umpan_kurang_bait',
+        'kondisi_umpan_rusak_bait',
+        'tindakan_ganti_bait',
+        'tindakan_tambah_bait',
+        'kondisi_rbs',
+        'tindakan_rbs',
     ];
 
     /**

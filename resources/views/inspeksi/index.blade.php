@@ -451,33 +451,16 @@
                         offCanvasUpdateElement = document.querySelector('#update-record');
                     // To open offCanvas, to update new record
                     if (editRecord) {
-                        // editRecord.forEach(el => {
-                        //     el.addEventListener('click', function() {
-                        //         offEditCanvasEl = new bootstrap.Offcanvas(
-                        //             offCanvasUpdateElement);
-                        //         // Empty fields and select into default value on offCanvas open
-                        //         //get data from row
-                        //         var data = $('#datatables-basic').DataTable().row($(
-                        //                 this)
-                        //             .parents('tr')).data();
-                        //         offCanvasUpdateElement.querySelectorAll('input')
-                        //             .forEach(el =>
-                        //                 el.value = '');
-                        //         offCanvasUpdateElement.querySelector(
-                        //                 '.dt-id-edit-hama').value =
-                        //             data.id;
-                        //         offCanvasUpdateElement.querySelector(
-                        //                 '.dt-kode-hama').value =
-                        //             data.hama_kode;
-                        //         offCanvasUpdateElement.querySelector(
-                        //                 '.dt-nama-hama').value =
-                        //             data.hama_nama;
-                        //         offCanvasUpdateElement.querySelector(
-                        //                 '.dt-metode-id').value =
-                        //             data.metode_id;
-                        //         offEditCanvasEl.show();
-                        //     });
-                        // });
+                        editRecord.forEach(function(e) {
+                            e.addEventListener('click', function() {
+                                var row = $('#datatables-basic').DataTable().row($(
+                                    this).parents('tr'));
+                                var data = row.data();
+                                window.location.href =
+                                    '{{ route('inspeksi.edit', ['id' => ':id']) }}'
+                                    .replace(':id', data.id);
+                            });
+                        });
                     }
                 }, 300);
 
@@ -486,15 +469,12 @@
                     document.querySelectorAll('.delete-record').forEach(function(element) {
                         element.addEventListener('click', function() {
                             var row = $('#datatables-basic').DataTable().row($(this)
-                                .parents(
-                                    'tr'));
+                                .parents('tr'));
                             var data = row.data();
                             Swal.fire({
                                 title: 'Apakah Anda yakin?',
-                                text: "Data Inspeksi hama " + data.hama
-                                    .hama_nama + " tanggal " + data
+                                text: "Data Inspeksi tanggal " + data
                                     .tanggal +
-                                    " oleh " + data.pegawai +
                                     " akan dihapus!",
                                 icon: 'warning',
                                 showCancelButton: true,
@@ -554,7 +534,7 @@
 @endsection
 
 @section('content')
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Inspeksi</h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Transaksi /</span> Inspeksi</h4>
 
     <!-- DataTable with Buttons -->
     <div class="card">
