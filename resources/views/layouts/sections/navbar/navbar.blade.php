@@ -46,10 +46,18 @@
         </div> --}}
     <!-- /Search -->
     <div class="navbar-nav align-items-center">
-        <div class="nav-item d-flex align-items-center">
+        <!-- Desktop: show full company name -->
+        <div class="nav-item d-none d-sm-flex align-items-center">
             <span class="fw-bold fs-4 text-primary">
                 <i class="bx bx-building-house me-2"></i>
                 PT. SAVANA TIRTA MAKMUR
+            </span>
+        </div>
+        <!-- Mobile: show abbreviated name -->
+        <div class="nav-item d-flex d-sm-none align-items-center">
+            <span class="fw-bold fs-4 text-primary">
+                <i class="bx bx-building-house me-2"></i>
+                PT. STM
             </span>
         </div>
     </div>
@@ -61,6 +69,14 @@
                 data-size="large" data-show-count="true"
                 aria-label="Star themeselection/sneat-html-laravel-admin-template-free on GitHub">Star</a>
         </li> --}}
+
+        <!-- Style Switcher -->
+        <li class="nav-item me-2 me-xl-0">
+            <a class="nav-link style-switcher-toggle hide-arrow" href="javascript:void(0);">
+                <i class="bx bx-sm"></i>
+            </a>
+        </li>
+        <!--/ Style Switcher -->
 
         <!-- User -->
         <li class="nav-item navbar-dropdown dropdown-user dropdown">

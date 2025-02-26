@@ -44,10 +44,7 @@ if (document.getElementById('layout-menu')) {
       // Enable menu state with local storage support if enableMenuLocalStorage = true from config.js
       if (config.enableMenuLocalStorage && !window.Helpers.isSmallScreen()) {
         try {
-          localStorage.setItem(
-            'templateCustomizer-' + templateName + '--LayoutCollapsed',
-            String(window.Helpers.isCollapsed())
-          );
+          localStorage.setItem(templateName + '--LayoutCollapsed', String(window.Helpers.isCollapsed()));
         } catch (e) {}
       }
     });
@@ -68,13 +65,16 @@ if (document.getElementById('layout-menu')) {
     elem.onmouseleave = function () {
       // Clear any timers set to timeout
       document.querySelector('.layout-menu-toggle').classList.remove('d-block');
+      // alert('layout-menu-toggle'); ///--checking
       clearTimeout(timeout);
     };
   };
   if (document.getElementById('layout-menu')) {
+    // console.log(Helpers); ///--checking
     delay(document.getElementById('layout-menu'), function () {
       // not for small screen
       if (!Helpers.isSmallScreen()) {
+        // alert('layout-menu'); ///--checking
         document.querySelector('.layout-menu-toggle').classList.add('d-block');
       }
     });
@@ -105,54 +105,54 @@ if (document.getElementById('layout-menu')) {
     });
   }
 
-  // // Style Switcher (Light/Dark Mode)
-  // //---------------------------------
+  // Style Switcher (Light/Dark Mode)
+  //---------------------------------
 
-  // let styleSwitcherToggleEl = document.querySelector('.style-switcher-toggle');
-  // if (window.templateCustomizer) {
-  //   // setStyle light/dark on click of styleSwitcherToggleEl
-  //   if (styleSwitcherToggleEl) {
-  //     styleSwitcherToggleEl.addEventListener('click', function () {
-  //       if (window.Helpers.isLightStyle()) {
-  //         window.templateCustomizer.setStyle('dark');
-  //       } else {
-  //         window.templateCustomizer.setStyle('light');
-  //       }
-  //     });
-  //   }
-  //   // Update style switcher icon and tooltip based on current style
-  //   if (window.Helpers.isLightStyle()) {
-  //     if (styleSwitcherToggleEl) {
-  //       styleSwitcherToggleEl.querySelector('i').classList.add('bx-moon');
-  //       new bootstrap.Tooltip(styleSwitcherToggleEl, {
-  //         title: 'Dark mode',
-  //         fallbackPlacements: ['bottom']
-  //       });
-  //     }
-  //     switchImage('light');
-  //   } else {
-  //     if (styleSwitcherToggleEl) {
-  //       styleSwitcherToggleEl.querySelector('i').classList.add('bx-sun');
-  //       new bootstrap.Tooltip(styleSwitcherToggleEl, {
-  //         title: 'Light mode',
-  //         fallbackPlacements: ['bottom']
-  //       });
-  //     }
-  //     switchImage('dark');
-  //   }
-  // } else {
-  //   // Removed style switcher element if not using template customizer
-  //   styleSwitcherToggleEl.parentElement.remove();
-  // }
+  let styleSwitcherToggleEl = document.querySelector('.style-switcher-toggle');
+  if (window.templateCustomizer) {
+    // setStyle light/dark on click of styleSwitcherToggleEl
+    if (styleSwitcherToggleEl) {
+      styleSwitcherToggleEl.addEventListener('click', function () {
+        if (window.Helpers.isLightStyle()) {
+          window.templateCustomizer.setStyle('dark');
+        } else {
+          window.templateCustomizer.setStyle('light');
+        }
+      });
+    }
+    // Update style switcher icon and tooltip based on current style
+    if (window.Helpers.isLightStyle()) {
+      if (styleSwitcherToggleEl) {
+        styleSwitcherToggleEl.querySelector('i').classList.add('bx-moon');
+        new bootstrap.Tooltip(styleSwitcherToggleEl, {
+          title: 'Dark mode',
+          fallbackPlacements: ['bottom']
+        });
+      }
+      switchImage('light');
+    } else {
+      if (styleSwitcherToggleEl) {
+        styleSwitcherToggleEl.querySelector('i').classList.add('bx-sun');
+        new bootstrap.Tooltip(styleSwitcherToggleEl, {
+          title: 'Light mode',
+          fallbackPlacements: ['bottom']
+        });
+      }
+      switchImage('dark');
+    }
+  } else {
+    // Removed style switcher element if not using template customizer
+    styleSwitcherToggleEl.parentElement.remove();
+  }
 
-  // // Update light/dark image based on current style
-  // function switchImage(style) {
-  //   const switchImagesList = [].slice.call(document.querySelectorAll('[data-app-' + style + '-img]'));
-  //   switchImagesList.map(function (imageEl) {
-  //     const setImage = imageEl.getAttribute('data-app-' + style + '-img');
-  //     imageEl.src = assetsPath + 'img/' + setImage; // Using window.assetsPath to get the exact relative path
-  //   });
-  // }
+  // Update light/dark image based on current style
+  function switchImage(style) {
+    const switchImagesList = [].slice.call(document.querySelectorAll('[data-app-' + style + '-img]'));
+    switchImagesList.map(function (imageEl) {
+      const setImage = imageEl.getAttribute('data-app-' + style + '-img');
+      imageEl.src = assetsPath + 'img/' + setImage; // Using window.assetsPath to get the exact relative path
+    });
+  }
 
   // Internationalization (Language Dropdown)
   // ---------------------------------------

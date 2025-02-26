@@ -106,12 +106,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/inspeksi/dataperbulan', [InspeksiController::class, 'dataperbulan'])->name('inspeksi.dataperbulan');
     Route::get('/inspeksi/datapermetode', [InspeksiController::class, 'datapermetode'])->name('inspeksi.datapermetode');
     Route::get('/inspeksi/datainspeksidetail/{id}', [InspeksiController::class, 'dataInputTable'])->name('inspeksi.datainspeksidetail');
+    Route::get('/inspeksi/dataperlokasi', [InspeksiController::class, 'dataperlokasi'])->name('inspeksi.dataperlokasi');
+    Route::get('/inspeksi/datahamaperkondisi', [InspeksiController::class, 'datahamaperkondisi'])->name('inspeksi.datahamaperkondisi');
+    Route::get('/inspeksi/datahamaperlokasi', [InspeksiController::class, 'datahamaperlokasi'])->name('inspeksi.datahamaperlokasi');
 
     //dashboard
     Route::get('/dashboard/linechart', [DashboardController::class, 'linechart'])->name('dashboard.linechart');
+    Route::get('/dashboard/linechart/{year}', [DashboardController::class, 'linechartbyyear'])->name('dashboard.linechartbyyear');
     Route::get('/dashboard/areachart', [DashboardController::class, 'areachart'])->name('dashboard.areachart');
     Route::get('/dashboard/donutchart', [DashboardController::class, 'donutchart'])->name('dashboard.donutchart');
     Route::get('/dashboard/barchart', [DashboardController::class, 'barchart'])->name('dashboard.barchart');
+    Route::get('/dashboard/barchart/{year}', [DashboardController::class, 'barchartbyyear'])->name('dashboard.barchartbyyear');
     Route::get('/dashboard/piecharttotal', [DashboardController::class, 'piecharttotal'])->name('dashboard.piecharttotal');
     Route::get('/dashboard/piechartpgt', [DashboardController::class, 'piechartpgt'])->name('dashboard.piechartpgt');
     Route::get('/dashboard/piechartfs', [DashboardController::class, 'piechartfs'])->name('dashboard.piechartfs');

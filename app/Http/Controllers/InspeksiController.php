@@ -103,7 +103,7 @@ class InspeksiController extends Controller
         $query = Inspeksi::query()
             ->with(['metode', 'lokasi', 'hama'])
             ->whereMonth('tanggal', $request->bulan ?? now()->month)
-            ->whereYear('tanggal', now()->year);
+            ->whereYear('tanggal', $request->tahun ?? now()->year);
 
         return datatables()
             ->eloquent($query)
@@ -120,9 +120,17 @@ class InspeksiController extends Controller
      */
     public function datapermetode(Request $request)
     {
+        $bulan = $request->input('bulan') ?? '';
+        $tahun = $request->input('tahun') ?? '';
+
         $query = Inspeksi::query()
             ->with(['metode', 'lokasi', 'hama'])
-            ->whereYear('tanggal', now()->year)
+            ->when($bulan !== 'all', function ($q) use ($bulan) {
+                return $q->whereMonth('tanggal', $bulan);
+            })
+            ->when($tahun, function ($q) use ($tahun) {
+                return $q->whereYear('tanggal', $tahun);
+            })
             ->where('metode_id', $request->metode_id); // Added filter for metode_id
 
         return datatables()
@@ -143,6 +151,83 @@ class InspeksiController extends Controller
                 return '<input type="checkbox" name="tindakan[' . $data->id . '][checked]" value="1">';
             })
             ->rawColumns(['checked'])
+            ->make(true);
+    }
+
+    public function dataperlokasi(Request $request)
+    {
+        $lokasi = $request->input('lokasi') ?? '';
+        $bulan  = $request->input('bulan') ?? '';
+        $tahun  = $request->input('tahun') ?? '';
+
+        $query = Inspeksi::query()->with(['inspeksidetail', 'lokasi'])
+            ->where('lokasi_id', $lokasi)
+            ->when($bulan, function ($q) use ($bulan) {
+                return $q->whereMonth('tanggal', $bulan);
+            })
+            ->when($tahun, function ($q) use ($tahun) {
+                return $q->whereYear('tanggal', $tahun);
+            })
+        ;
+
+        return datatables()
+            ->eloquent($query)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+    public function datahamaperkondisi(Request $request)
+    {
+        $kondisi = $request->input('kondisi') ?? '';
+        $bulan   = $request->input('bulan') ?? '';
+        $tahun   = $request->input('tahun') ?? '';
+
+        $query = Inspeksi::query()->with(['inspeksidetail', 'lokasi'])
+            ->where('metode_id', 3)
+            ->when($kondisi, function ($q) use ($kondisi) {
+                return $q->whereHas('inspeksidetail', function ($query) use ($kondisi) {
+                    $query->where('kondisi_rbs', strtoupper($kondisi));
+                });
+            })
+            ->when($bulan, function ($q) use ($bulan) {
+                return $q->whereMonth('tanggal', $bulan);
+            })
+            ->when($tahun, function ($q) use ($tahun) {
+                return $q->whereYear('tanggal', $tahun);
+            })
+        ;
+
+        return datatables()
+            ->eloquent($query)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+    public function datahamaperlokasi(Request $request)
+    {
+        $lokasi = $request->input('lokasi') ?? '';
+        $bulan  = $request->input('bulan') ?? '';
+        $tahun  = $request->input('tahun') ?? '';
+
+        // get lokasi id from the name
+        $lokasi_id = Lokasi::where('lokasi_nama', $lokasi)->first()->id;
+
+        $query = Inspeksi::query()->with(['inspeksidetail', 'lokasi', 'metode'])
+            ->where('metode_id', '!=', 3)
+            ->when($bulan !== 'all', function ($q) use ($bulan) {
+                return $q->whereMonth('tanggal', $bulan);
+            })
+            ->when($tahun !== 'all', function ($q) use ($tahun) {
+                return $q->whereYear('tanggal', $tahun);
+            })
+            ->when($lokasi_id, function ($q) use ($lokasi_id) {
+                return $q->where('lokasi_id', $lokasi_id);
+            })
+        ;
+
+        return datatables()
+            ->eloquent($query)
+            ->addIndexColumn()
             ->make(true);
     }
 

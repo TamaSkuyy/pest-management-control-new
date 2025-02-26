@@ -58,6 +58,20 @@
                                                     <h5 class="card-title mb-0">Inspeksi</h5>
                                                     <small class="text-muted">Data Inspeksi per bulan</small>
                                                 </div>
+                                                <div>
+                                                    <select id="yearFilterLineChart" class="form-select">
+                                                        @php
+                                                            $currentYear = date('Y');
+                                                            $startYear = 2024; // You can adjust this starting year
+                                                        @endphp
+                                                        @for ($year = $currentYear; $year >= $startYear; $year--)
+                                                            <option value="{{ $year }}"
+                                                                {{ $year == $currentYear ? 'selected' : '' }}>
+                                                                {{ $year }}
+                                                            </option>
+                                                        @endfor
+                                                    </select>
+                                                </div>
                                             </div>
                                             <div class="card-body">
                                                 <div id="lineChart"></div>
@@ -67,13 +81,43 @@
                                     </div>
                                 </div>
                                 <div class="swiper-slide">
-                                    <!-- Pie Chart -->
+                                    <!-- Donut Chart -->
                                     <div class="row p-3 m-3">
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between">
                                                 <div>
                                                     <h5 class="card-title mb-0">Distribusi Inspeksi</h5>
                                                     <small class="text-muted">Berdasarkan Metode Inspeksi</small>
+                                                </div>
+                                                {{-- filter month and year --}}
+                                                <div class="d-flex">
+                                                    <div class="me-2">
+                                                        <select id="monthFilterDonutChart" class="form-select">
+                                                            @php
+                                                                $currentMonth = date('m');
+                                                            @endphp
+                                                            @for ($month = 1; $month <= 12; $month++)
+                                                                <option value="{{ $month }}">
+                                                                    {{ date('F', mktime(0, 0, 0, $month, 1)) }}
+                                                                </option>
+                                                            @endfor
+                                                            <option value="all" selected>All Months</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <select id="yearFilterDonutChart" class="form-select">
+                                                            @php
+                                                                $currentYear = date('Y');
+                                                                $startYear = 2024; // You can adjust this starting year
+                                                            @endphp
+                                                            @for ($year = $currentYear; $year >= $startYear; $year--)
+                                                                <option value="{{ $year }}"
+                                                                    {{ $year == $currentYear ? 'selected' : '' }}>
+                                                                    {{ $year }}
+                                                                </option>
+                                                            @endfor
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="card-body">
@@ -84,12 +128,42 @@
                                 </div>
                                 <div class="swiper-slide">
                                     <!-- Pie Chart -->
-                                    <div class="col-12 mb-4">
+                                    <div class="row p-3 m-3">
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between">
                                                 <div>
                                                     <h5 class="card-title mb-0">Data Lokasi</h5>
                                                     <small class="text-muted">Per Metode dan Total</small>
+                                                </div>
+                                                {{-- filter month and year --}}
+                                                <div class="d-flex">
+                                                    <div class="me-2">
+                                                        <select id="monthFilterPieChart" class="form-select">
+                                                            @php
+                                                                $currentMonth = date('m');
+                                                            @endphp
+                                                            @for ($month = 1; $month <= 12; $month++)
+                                                                <option value="{{ $month }}">
+                                                                    {{ date('F', mktime(0, 0, 0, $month, 1)) }}
+                                                                </option>
+                                                            @endfor
+                                                            <option value="all" selected>All Months</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <select id="yearFilterPieChart" class="form-select">
+                                                            @php
+                                                                $currentYear = date('Y');
+                                                                $startYear = 2024; // You can adjust this starting year
+                                                            @endphp
+                                                            @for ($year = $currentYear; $year >= $startYear; $year--)
+                                                                <option value="{{ $year }}"
+                                                                    {{ $year == $currentYear ? 'selected' : '' }}>
+                                                                    {{ $year }}
+                                                                </option>
+                                                            @endfor
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="card-body">
@@ -111,12 +185,26 @@
                                 </div>
                                 <div class="swiper-slide">
                                     <!-- Line Chart -->
-                                    <div class="col-12 mb-4">
+                                    <div class="row p-3 m-3">
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between">
                                                 <div>
                                                     <h5 class="card-title mb-0">Data Hama</h5>
                                                     <small class="text-muted">Per Kondisi Bait</small>
+                                                </div>
+                                                <div>
+                                                    <select id="yearFilterBarChart" class="form-select">
+                                                        @php
+                                                            $currentYear = date('Y');
+                                                            $startYear = 2024; // You can adjust this starting year
+                                                        @endphp
+                                                        @for ($year = $currentYear; $year >= $startYear; $year--)
+                                                            <option value="{{ $year }}"
+                                                                {{ $year == $currentYear ? 'selected' : '' }}>
+                                                                {{ $year }}
+                                                            </option>
+                                                        @endfor
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="card-body">
@@ -168,7 +256,7 @@
                     <h5 class="modal-title">Detail Inspeksi
                         <span id="bulanInspeksi"></span>
 
-                        {{ date('Y') }}
+                        <span id="tahunInspeksi"></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -191,7 +279,7 @@
         </div>
     </div>
 
-    <!-- Modal Inspection -->
+    <!-- Modal Inspection Metode -->
     <div class="modal fade" id="inspectionMetodeModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -209,6 +297,64 @@
                                 <th>Lokasi</th>
                                 <th>Hama</th>
                                 <th>Pegawai</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Inspection Lokasi -->
+    <div class="modal fade" id="inspectionLokasiModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Inspeksi Lokasi <span id="namaLokasi"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table id="inspeksiLokasiTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tanggal</th>
+                                <th>Metode</th>
+                                <th>Lokasi</th>
+                                <th>Hama</th>
+                                <th>Pegawai</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <!-- Add table rows here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Inspection Kondisi Bait -->
+    <div class="modal fade" id="inspectionKondisiBaitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Inspeksi Kondisi Bait <span id="kondisiBait"></span> - Bulan <span
+                            id="bulanKondisiBait"></span> - Tahun <span id="tahunKondisiBait"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table id="inspeksiKondisiBaitTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tanggal</th>
+                                <th>Lokasi</th>
+                                <th>Kondisi Bait</th>
+                                <th>Tindakan</th>
                                 <th>Jumlah</th>
                             </tr>
                         </thead>

@@ -59,5 +59,17 @@ export default defineConfig({
       refresh: true
     }),
     html()
-  ]
+  ],
+  server: {
+    host: '0.0.0.0', // Bind to all network interfaces
+    port: parseInt(process.env.PORT ?? '5173', 10), // Port for Vite
+    hmr: {
+      host: 'localhost' // Specify host for hot module replacement
+    }
+  },
+  resolve: {
+    alias: {
+      $: 'jquery'
+    }
+  }
 });
