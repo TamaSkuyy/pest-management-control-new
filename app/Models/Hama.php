@@ -41,4 +41,14 @@ class Hama extends Model
     {
         return $this->belongsTo(Metode::class, 'metode_id', 'id');
     }
+
+    /**
+     * Get all of the inspeksi for the Hama
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function inspeksi()
+    {
+        return $this->hasMany(Inspeksi::class, 'hama_id', 'id');
+    }
 }

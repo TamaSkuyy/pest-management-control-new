@@ -117,9 +117,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/donutchart', [DashboardController::class, 'donutchart'])->name('dashboard.donutchart');
     Route::get('/dashboard/barchart', [DashboardController::class, 'barchart'])->name('dashboard.barchart');
     Route::get('/dashboard/barchart/{year}', [DashboardController::class, 'barchartbyyear'])->name('dashboard.barchartbyyear');
-    Route::get('/dashboard/piecharttotal', [DashboardController::class, 'piecharttotal'])->name('dashboard.piecharttotal');
+    // Route::get('/dashboard/piecharttotal', [DashboardController::class, 'piecharttotal'])->name('dashboard.piecharttotal');
     Route::get('/dashboard/piechartpgt', [DashboardController::class, 'piechartpgt'])->name('dashboard.piechartpgt');
     Route::get('/dashboard/piechartfs', [DashboardController::class, 'piechartfs'])->name('dashboard.piechartfs');
+    Route::get('/dashboard/piechartrbs', [DashboardController::class, 'piechartrbs'])->name('dashboard.piechartrbs');
+    Route::get('/dashboard/linecharthama', [DashboardController::class, 'linecharthama'])->name('dashboard.linecharthama');
+    Route::get('/dashboard/donuthama', [DashboardController::class, 'donuthama'])->name('dashboard.donuthama');
+    Route::get('/dashboard/security-layers', [DashboardController::class, 'getSecurityLayers'])->name('dashboard.securityLayers');
+    Route::get('/dashboard/metode/{metodeId}', [DashboardController::class, 'getMetodeName'])->name('dashboard.getMetodeName');
+    Route::get('/dashboard/metodes', [DashboardController::class, 'getAllMetodes'])->name('dashboard.getAllMetodes');
 
 });
 

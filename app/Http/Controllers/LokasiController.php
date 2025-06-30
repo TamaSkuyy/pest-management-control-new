@@ -21,7 +21,7 @@ class LokasiController extends Controller
      */
     public function create()
     {
-        return view('metode.create');
+        // return view('metode.create');
     }
 
     /**
@@ -140,6 +140,7 @@ class LokasiController extends Controller
             'lokasi_kode'  => 'required',
             'lokasi_nama'  => 'required',
             'lokasi_jenis' => 'required|integer',
+            'lokasi_lapisan_pengaman' => 'nullable|string',
         ]);
 
         try {
@@ -147,6 +148,7 @@ class LokasiController extends Controller
             $lokasi->lokasi_kode  = $request->lokasi_kode;
             $lokasi->lokasi_nama  = $request->lokasi_nama;
             $lokasi->lokasi_jenis = $request->lokasi_jenis;
+            $lokasi->lokasi_lapisan_pengaman = $request->lokasi_lapisan_pengaman ?? null;
             $lokasi->save();
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Gagal menyimpan lokasi: ' . $e->getMessage()]);
@@ -180,6 +182,7 @@ class LokasiController extends Controller
             'lokasi_kode'  => 'required',
             'lokasi_nama'  => 'required',
             'lokasi_jenis' => 'required',
+            'lokasi_lapisan_pengaman' => 'nullable|string',
         ]);
 
         $lokasi = Lokasi::findOrFail($id);
@@ -192,6 +195,7 @@ class LokasiController extends Controller
                 'lokasi_kode'  => $validate['lokasi_kode'],
                 'lokasi_nama'  => $validate['lokasi_nama'],
                 'lokasi_jenis' => $validate['lokasi_jenis'],
+                'lokasi_lapisan_pengaman' => $validate['lokasi_lapisan_pengaman'] ?? null,
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Gagal mengupdate lokasi: ' . $e->getMessage()]);

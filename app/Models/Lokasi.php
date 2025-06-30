@@ -29,5 +29,6 @@ class Lokasi extends Model
         'lokasi_kode',
         'lokasi_nama',
         'lokasi_jenis',  //1 = indoor, 2 = outdoor
+        'lokasi_lapisan_pengaman'
     ];
 }

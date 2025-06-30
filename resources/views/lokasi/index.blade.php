@@ -58,6 +58,9 @@
                                 data: 'lokasi_jenis'
                             },
                             {
+                                data: 'lokasi_lapisan_pengaman'
+                            },
+                            {
                                 data: ''
                             }
                         ],
@@ -419,7 +422,8 @@
                 fv.on('core.form.valid', function() {
                     var new_lokasi_kode = $('.add-new-record .dt-kode-lokasi').val(),
                         new_lokasi_nama = $('.add-new-record .dt-nama-lokasi').val(),
-                        new_lokasi_jenis = $('.add-new-record .dt-jenis-lokasi').val();
+                        new_lokasi_jenis = $('.add-new-record .dt-jenis-lokasi').val(),
+                        new_lokasi_lapisan_pengaman = $('.add-new-record .dt-lapisan-pengaman').val();
 
                     if (new_lokasi_kode != '') {
                         $.ajax({
@@ -439,6 +443,7 @@
                                     $('.add-new-record .dt-kode-lokasi').val('');
                                     $('.add-new-record .dt-nama-lokasi').val('');
                                     $('.add-new-record .dt-jenis').val('');
+                                    $('.add-new-record .dt-lapisan-pengaman').val('');
                                     offCanvasEl.hide();
                                     Swal.fire({
                                         icon: 'success',
@@ -575,6 +580,8 @@
                                     offCanvasUpdateElement.querySelector(
                                         '.dt-jenis-lokasi').value = 2;
                                 }
+                                offCanvasUpdateElement.querySelector(
+                                    '.dt-lapisan-pengaman').value = data.lokasi_lapisan_pengaman;
                                 offEditCanvasEl.show();
                             });
                         });
@@ -635,7 +642,8 @@
                     var id = $('.update-record .dt-id-edit-lokasi').val(),
                         lokasi_kode = $('.update-record .dt-kode-lokasi').val(),
                         lokasi_nama = $('.update-record .dt-nama-lokasi').val(),
-                        lokasi_jenis = $('.update-record .dt-jenis-lokasi').val();
+                        lokasi_jenis = $('.update-record .dt-jenis-lokasi').val(),
+                        lokasi_lapisan_pengaman = $('.update-record .dt-lapisan-pengaman').val();
 
                     if (lokasi_kode != '') {
                         $.ajax({
@@ -648,6 +656,7 @@
                                 lokasi_kode: lokasi_kode,
                                 lokasi_nama: lokasi_nama,
                                 lokasi_jenis: lokasi_jenis,
+                                lokasi_lapisan_pengaman: lokasi_lapisan_pengaman,
                             },
                             success: function(response) {
                                 // console.log(response); // Check the response in the console
@@ -658,6 +667,7 @@
                                     $('.update-record .dt-kode-lokasi').val('');
                                     $('.update-record .dt-nama-lokasi').val('');
                                     $('.update-record .dt-jenis-lokasi').val('');
+                                    $('.update-record .dt-lapisan-pengaman').val('');
                                     offEditCanvasEl.hide();
                                     Swal.fire({
                                         icon: 'success',
@@ -767,6 +777,7 @@
                         <th>Kode</th>
                         <th>Nama</th>
                         <th>Jenis</th>
+                        <th>Lapisan Pengaman</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -804,6 +815,18 @@
                             <option value="">Pilih Jenis</option>
                             <option value="1">Indoor</option>
                             <option value="2">Outdoor</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <label class="form-label" for="lokasi_lapisan_pengaman">{{ __('Ring Lapisan Pengaman') }}</label>
+                    <div class="input-group input-group-merge">
+                        <select class="form-select dt-lapisan-pengaman" id="lokasi_lapisan_pengaman" name="lokasi_lapisan_pengaman"
+                            aria-label="Pilih Lapisan Pengaman" required>
+                            <option value="">Pilih Lapisan Pengaman</option>
+                            <option value="Ring I">Ring I</option>
+                            <option value="Ring II">Ring II</option>
+                            <option value="Ring III">Ring III</option>
                         </select>
                     </div>
                 </div>
@@ -851,6 +874,18 @@
                             <option value="">Pilih Jenis</option>
                             <option value="1">Indoor</option>
                             <option value="2">Outdoor</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <label class="form-label" for="lokasi_lapisan_pengaman">{{ __('Ring Lapisan Pengaman') }}</label>
+                    <div class="input-group input-group-merge">
+                        <select class="form-select dt-lapisan-pengaman" id="lokasi_lapisan_pengaman" name="lokasi_lapisan_pengaman"
+                            aria-label="Pilih Lapisan Pengaman" required>
+                            <option value="">Pilih Lapisan Pengaman</option>
+                            <option value="Ring I">Ring I</option>
+                            <option value="Ring II">Ring II</option>
+                            <option value="Ring III">Ring III</option>
                         </select>
                     </div>
                 </div>

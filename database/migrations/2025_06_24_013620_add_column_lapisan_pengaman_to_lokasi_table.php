@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('inspeksi_detail', function (Blueprint $table) {
-            $table->enum('kondisi_rbs', ['OK', 'RUSAK', 'HILANG'])->nullable();
-            $table->enum('tindakan_rbs', ['GANTI', 'CLEANING'])->nullable();
+        Schema::table('lokasi', function (Blueprint $table) {
+            $table->string('lokasi_lapisan_pengaman')->nullable()->after('lokasi_jenis');
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('inspeksi_detail', function (Blueprint $table) {
-            $table->dropColumn(['kondisi_rbs', 'tindakan_rbs']);
+        Schema::table('lokasi', function (Blueprint $table) {
+            $table->dropColumn('lokasi_lapisan_pengaman');
         });
     }
 };

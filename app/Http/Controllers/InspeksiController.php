@@ -8,6 +8,7 @@ use App\Models\Lokasi;
 use App\Models\Metode;
 use App\Models\Tindakan;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class InspeksiController extends Controller
@@ -99,11 +100,43 @@ class InspeksiController extends Controller
      */
     public function dataperbulan(Request $request)
     {
+        $metodeId = $request->get('metode_id');
+        $bulan = $request->get('bulan');
+        $tahun = $request->get('tahun', date('Y'));
+        $period = $request->get('period'); // New parameter for bi-weekly period
 
         $query = Inspeksi::query()
             ->with(['metode', 'lokasi', 'hama'])
-            ->whereMonth('tanggal', $request->bulan ?? now()->month)
-            ->whereYear('tanggal', $request->tahun ?? now()->year);
+            ->whereYear('tanggal', $tahun);
+
+        if ($metodeId) {
+            $query->where('metode_id', $metodeId);
+        }
+
+        if ($bulan) {
+            if ($period) {
+                // Handle bi-weekly periods
+                if ($period == '1') {
+                    // First half: days 1-15
+                    $startDate = Carbon::create($tahun, $bulan, 1)->startOfDay();
+                    $endDate = Carbon::create($tahun, $bulan, 15)->endOfDay();
+                } else {
+                    // Second half: days 16-end of month
+                    $startDate = Carbon::create($tahun, $bulan, 16)->startOfDay();
+                    $endDate = Carbon::create($tahun, $bulan, 1)->endOfMonth()->endOfDay();
+                }
+                
+                $query->whereBetween('tanggal', [$startDate, $endDate]);
+            } else {
+                // Original monthly filter
+                $query->whereMonth('tanggal', $bulan);
+            }
+        }
+
+        // Filter by metode if provided (backward compatibility)
+        if ($request->has('metodeId') && $request->metodeId) {
+            $query->where('metode_id', $request->metodeId);
+        }
 
         return datatables()
             ->eloquent($query)

@@ -5,7 +5,69 @@
 import Swiper from 'swiper/bundle';
 // import 'swiper/swiper-bundle.css';
 
+// Dashboard Enhancement Functions
+const DashboardEnhancement = {
+  // Show loading spinner on chart containers
+  showChartLoading: function(chartElement) {
+    if (chartElement) {
+      chartElement.classList.add('chart-loading');
+      const spinner = document.createElement('div');
+      spinner.className = 'chart-spinner';
+      spinner.innerHTML = '<div class="spinner-border spinner-border-custom" role="status"><span class="visually-hidden">Loading...</span></div>';
+      chartElement.appendChild(spinner);
+    }
+  },
+
+  // Hide loading spinner
+  hideChartLoading: function(chartElement) {
+    if (chartElement) {
+      chartElement.classList.remove('chart-loading');
+      const spinner = chartElement.querySelector('.chart-spinner');
+      if (spinner) {
+        spinner.remove();
+      }
+    }
+  },
+
+  // Add fade-in animation to charts
+  addChartAnimation: function(chartElement) {
+    if (chartElement) {
+      chartElement.classList.add('chart-fade-in');
+    }
+  },
+
+  // Show success notification
+  showNotification: function(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      if (notification && notification.parentNode) {
+        notification.remove();
+      }
+    }, 5000);
+  },
+
+  // Initialize tooltips
+  initializeTooltips: function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  }
+};
+
 (function () {
+  // Initialize dashboard enhancements
+  DashboardEnhancement.initializeTooltips();
+
   const swiperWithPagination = document.querySelector('#swiper-with-pagination');
   let galleryInstance;
 
@@ -94,7 +156,9 @@ import Swiper from 'swiper/bundle';
             reset: true
           }
         },
-        events: {}
+        events: {
+          // Chart events can be added here if needed
+        }
       },
       dataLabels: {
         enabled: false
@@ -158,7 +222,13 @@ import Swiper from 'swiper/bundle';
       .done(function (response) {
         areaChart.updateOptions({
           xaxis: {
-            categories: response.categories
+            categories: response.categories,
+            labels: {
+              style: {
+                colors: labelColor,
+                fontSize: '13px'
+              }
+            }
           },
           series: response.data
         });
@@ -185,33 +255,20 @@ import Swiper from 'swiper/bundle';
         events: {
           click: function (event, chartContext, config) {
             const dataPointIndex = config.dataPointIndex;
+            const seriesIndex = config.seriesIndex;
 
             if (dataPointIndex !== -1) {
-              if (dataPointIndex === 0) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Januari';
-              } else if (dataPointIndex === 1) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Februari';
-              } else if (dataPointIndex === 2) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Maret';
-              } else if (dataPointIndex === 3) {
-                document.getElementById('bulanInspeksi').innerHTML = 'April';
-              } else if (dataPointIndex === 4) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Mei';
-              } else if (dataPointIndex === 5) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Juni';
-              } else if (dataPointIndex === 6) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Juli';
-              } else if (dataPointIndex === 7) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Agustus';
-              } else if (dataPointIndex === 8) {
-                document.getElementById('bulanInspeksi').innerHTML = 'September';
-              } else if (dataPointIndex === 9) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Oktober';
-              } else if (dataPointIndex === 10) {
-                document.getElementById('bulanInspeksi').innerHTML = 'November';
-              } else if (dataPointIndex === 11) {
-                document.getElementById('bulanInspeksi').innerHTML = 'Desember';
-              }
+              // Calculate actual month and period from bi-weekly index
+              const monthIndex = Math.floor(dataPointIndex / 2) + 1;
+              const period = (dataPointIndex % 2) + 1;
+              
+              const monthNames = [
+                '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+              ];
+              const periodText = period === 1 ? ' (Minggu 1-2)' : ' (Minggu 3-4)';
+              
+              document.getElementById('bulanInspeksi').innerHTML = monthNames[monthIndex] + periodText;
 
               if ($.fn.DataTable.isDataTable('#inspeksiTable')) {
                 $('#inspeksiTable').DataTable().destroy();
@@ -219,6 +276,13 @@ import Swiper from 'swiper/bundle';
 
               var tahun = document.getElementById('yearFilterLineChart').value;
               document.getElementById('tahunInspeksi').innerHTML = tahun;
+              
+              // Set method name if a specific series was clicked
+              if (seriesIndex >= 0 && chartContext.w.globals.seriesNames[seriesIndex]) {
+                document.getElementById('namaMetodeInspeksi').innerHTML = '- Metode ' + chartContext.w.globals.seriesNames[seriesIndex] + ' - ';
+              } else {
+                document.getElementById('namaMetodeInspeksi').innerHTML = '';
+              }
 
               //tabel inspeksi
               $('#inspeksiTable').DataTable({
@@ -228,8 +292,10 @@ import Swiper from 'swiper/bundle';
                   url: route('inspeksi.dataperbulan'),
                   type: 'GET',
                   data: {
-                    bulan: dataPointIndex + 1,
-                    tahun: tahun
+                    metode_id: seriesIndex >= 0 ? (seriesIndex + 1) : null, // Assuming metode IDs start from 1
+                    bulan: monthIndex,
+                    tahun: tahun,
+                    period: period
                   },
                   error: function (xhr) {
                     if (xhr.status === 401) {
@@ -467,7 +533,7 @@ import Swiper from 'swiper/bundle';
                       }
                     }),
                     type: 'column',
-                    renderer: function (_, __, columns) {
+                    renderer: function (api, rowIdx, columns) {
                       var data = $.map(columns, function (col) {
                         return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
                           ? '<tr data-dt-row="' +
@@ -504,12 +570,13 @@ import Swiper from 'swiper/bundle';
         colors: [config.colors.warning]
       },
       dataLabels: {
-        enabled: true
+        enabled: false
       },
       stroke: {
-        curve: 'straight'
+        width: 3,
+        curve: 'smooth'
       },
-      colors: [config.colors.warning],
+      colors: [config.colors.primary, config.colors.info, config.colors.warning, config.colors.success, config.colors.danger],
       grid: {
         borderColor: borderColor,
         xaxis: {
@@ -521,12 +588,31 @@ import Swiper from 'swiper/bundle';
           top: -20
         }
       },
+      legend: {
+        show: true,
+        position: 'bottom',
+        horizontalAlign: 'center'
+      },
       tooltip: {
         custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-          return '<div class="px-3 py-2">' + '<span>' + series[seriesIndex][dataPointIndex] + '</span>' + '</div>';
+          const categoryIndex = dataPointIndex;
+          const monthIndex = Math.floor(categoryIndex / 2);
+          const period = (categoryIndex % 2) + 1;
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const monthName = monthNames[monthIndex];
+          const periodText = period === 1 ? 'Minggu 1-2' : 'Minggu 3-4';
+          
+          return `
+            <div class="px-3 py-2">
+              <div class="fw-bold">${w.config.series[seriesIndex].name}</div>
+              <div>${monthName} ${periodText}</div>
+              <div class="text-primary fw-bold">${series[seriesIndex][dataPointIndex]} inspeksi</div>
+            </div>
+          `;
         }
       },
       xaxis: {
+        categories: [],
         axisBorder: {
           show: false
         },
@@ -553,71 +639,49 @@ import Swiper from 'swiper/bundle';
   if (typeof lineChartEl !== undefined && lineChartEl !== null) {
     const lineChart = new ApexCharts(lineChartEl, lineChartConfig);
     lineChart.render();
+    window.lineChart = lineChart;
 
-    // $.getJSON('/dashboard/linechart', function (response) {
-    //   lineChart.updateOptions({
-    //     xaxis: {
-    //       categories: response.categories
-    //     },
-    //     series: [
-    //       {
-    //         name: 'Inspeksi',
-    //         data: response.data
-    //       }
-    //     ]
-    //   });
-    // });
-
-    // Function to initialize/update the chart
-    const updateChart = year => {
-      // Show loading animation
+    // Function to load line chart data
+    function loadLineChartData(year = null) {
       const lineChartContainer = document.querySelector('#lineChart');
       if (lineChartContainer) {
         lineChartContainer.classList.add('chart-loading');
-        // Create and add loading spinner if it doesn't exist
+        
         if (!lineChartContainer.querySelector('.chart-spinner')) {
           const spinner = document.createElement('div');
           spinner.className = 'chart-spinner';
-          spinner.innerHTML =
-            '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+          spinner.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
           lineChartContainer.appendChild(spinner);
         } else {
           lineChartContainer.querySelector('.chart-spinner').style.display = 'flex';
         }
       }
-
-      fetch(`/dashboard/linechart/${year}`)
+      
+      const url = year ? `/dashboard/linechart/${year}` : '/dashboard/linechart';
+      
+      fetch(url)
         .then(response => response.json())
         .then(data => {
-          const options = {
-            chart: {
-              height: 350,
-              type: 'line',
-              zoom: {
-                enabled: false
-              },
-              toolbar: {
-                show: true
-              }
-            },
-            series: [
-              {
-                name: 'Inspeksi',
-                data: data.data
-              }
-            ],
-            xaxis: {
-              categories: data.categories
-            }
+          // Store metode IDs for click handling
+          window.lineChartData = {
+            metodeIds: data.data.map((item, index) => {
+              return index + 1; // Assuming metode IDs are sequential starting from 1
+            })
           };
 
-          if (lineChart) {
-            lineChart.updateOptions(options);
-          } else {
-            lineChart = new ApexCharts(document.querySelector('#lineChart'), options);
-            lineChart.render();
-          }
-
+          window.lineChart.updateOptions({
+            series: data.data,
+            xaxis: {
+              categories: data.categories,
+              labels: {
+                style: {
+                  colors: labelColor,
+                  fontSize: '13px'
+                }
+              }
+            }
+          });
+          
           // Hide loading animation
           if (lineChartContainer) {
             setTimeout(() => {
@@ -626,12 +690,11 @@ import Swiper from 'swiper/bundle';
               if (spinner) {
                 spinner.style.display = 'none';
               }
-            }, 500); // Small delay to ensure smooth transition
+            }, 500);
           }
         })
         .catch(error => {
-          console.error('Error fetching line chart data:', error);
-          // Hide loading on error too
+          console.error('Error loading line chart data:', error);
           if (lineChartContainer) {
             lineChartContainer.classList.remove('chart-loading');
             const spinner = lineChartContainer.querySelector('.chart-spinner');
@@ -640,15 +703,18 @@ import Swiper from 'swiper/bundle';
             }
           }
         });
-    };
+    }
 
-    // Initialize chart with current year
-    updateChart(new Date().getFullYear());
+    // Load initial data
+    loadLineChartData();
 
-    // Add event listener for year change
-    document.getElementById('yearFilterLineChart').addEventListener('change', function () {
-      updateChart(this.value);
-    });
+    // Year filter change handler
+    const yearFilter = document.getElementById('yearFilterLineChart');
+    if (yearFilter) {
+      yearFilter.addEventListener('change', function() {
+        loadLineChartData(this.value);
+      });
+    }
   }
 
   // Horizontal Bar Chart
@@ -1010,7 +1076,13 @@ import Swiper from 'swiper/bundle';
       dataLabels: {
         enabled: true,
         formatter: function (val) {
-          return parseInt(val, 10) + '%';
+          return val.toFixed(1) + '%';
+        },
+        style: {
+          fontSize: '14px',
+          fontFamily: 'Public Sans',
+          fontWeight: 500,
+          colors: ['#fff']
         }
       },
       legend: {
@@ -1040,20 +1112,45 @@ import Swiper from 'swiper/bundle';
                 color: legendColor,
                 fontFamily: 'Public Sans',
                 formatter: function (val) {
-                  return parseInt(val, 10) + '%';
+                  return parseInt(val);
                 }
               },
               total: {
                 show: true,
                 fontSize: '1.5rem',
                 color: headingColor,
-                label: 'Inspeksi',
-                formatter: function () {
-                  return parseInt(100, 10) + '%';
+                label: 'Total Hama',
+                formatter: function (w) {
+                  return w.globals.seriesTotals.reduce((a, b) => {
+                    return a + b;
+                  }, 0);
                 }
               }
             }
           }
+        }
+      },
+      tooltip: {
+        custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+          const hamaName = w.globals.labels[seriesIndex];
+          const value = series[seriesIndex];
+          const percentage = ((value / w.globals.seriesTotals.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+          
+          return `
+            <div class="tooltip-custom">
+              <div class="tooltip-header">${hamaName}</div>
+              <div class="tooltip-body">
+                <div class="tooltip-item">
+                  <span class="tooltip-label">Jumlah:</span>
+                  <span class="tooltip-value">${value}</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-label">Persentase:</span>
+                  <span class="tooltip-value">${percentage}%</span>
+                </div>
+              </div>
+            </div>
+          `;
         }
       },
       responsive: [
@@ -1062,13 +1159,6 @@ import Swiper from 'swiper/bundle';
           options: {
             chart: {
               height: 380
-            },
-            legend: {
-              position: 'bottom',
-              labels: {
-                colors: legendColor,
-                useSeriesColors: false
-              }
             }
           }
         },
@@ -1077,31 +1167,6 @@ import Swiper from 'swiper/bundle';
           options: {
             chart: {
               height: 320
-            },
-            plotOptions: {
-              pie: {
-                donut: {
-                  labels: {
-                    show: true,
-                    name: {
-                      fontSize: '1.5rem'
-                    },
-                    value: {
-                      fontSize: '1rem'
-                    },
-                    total: {
-                      fontSize: '1.5rem'
-                    }
-                  }
-                }
-              }
-            },
-            legend: {
-              position: 'bottom',
-              labels: {
-                colors: legendColor,
-                useSeriesColors: false
-              }
             }
           }
         },
@@ -1115,185 +1180,121 @@ import Swiper from 'swiper/bundle';
               show: false
             }
           }
-        },
-        {
-          breakpoint: 360,
-          options: {
-            chart: {
-              height: 250
-            },
-            legend: {
-              show: false
-            }
-          }
         }
       ]
     };
 
-  if (typeof donutChartEl !== undefined && donutChartEl !== null) {
-    const donutChart = new ApexCharts(donutChartEl, donutChartConfig);
-    donutChart.render();
+  // if (typeof donutChartHamaEl !== undefined && donutChartHamaEl !== null) {
+  //   const donutChartHama = new ApexCharts(donutChartHamaEl, donutChartHamaConfig);
+  //   donutChartHama.render();
+  //   window.donutChartHama = donutChartHama;
 
-    // Function to update the donut chart based on month and year
-    const updateDonutChart = (month, year) => {
-      // Show loading animation
-      const donutChartContainer = document.querySelector('#donutChart');
-      if (donutChartContainer) {
-        donutChartContainer.classList.add('chart-loading');
-        // Create and add loading spinner if it doesn't exist
-        if (!donutChartContainer.querySelector('.chart-spinner')) {
-          const spinner = document.createElement('div');
-          spinner.className = 'chart-spinner';
-          spinner.innerHTML =
-            '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
-          donutChartContainer.appendChild(spinner);
-        } else {
-          donutChartContainer.querySelector('.chart-spinner').style.display = 'flex';
-        }
-      }
+  //   // Function to load donut chart hama data
+  //   function loadDonutChartHamaData(month = 'all', year = null, lapisanPengaman = 'all') {
+  //     const donutChartHamaContainer = document.querySelector('#donutChartHama');
+  //     if (donutChartHamaContainer) {
+  //       DashboardEnhancement.showChartLoading(donutChartHamaContainer);
+  //     }
+      
+  //     const params = new URLSearchParams({
+  //       month: month,
+  //       year: year || new Date().getFullYear(),
+  //       lapisan_pengaman: lapisanPengaman
+  //     });
+      
+  //     fetch(`/dashboard/donuthama?${params}`)
+  //       .then(response => response.json())
+  //       .then(data => {
+  //         if (data.series.length === 0 || data.labels.length === 0) {
+  //           donutChartHamaContainer.innerHTML = '<div class="text-center p-4"><p>Tidak ada data hama untuk periode yang dipilih.</p></div>';
+  //         } else {
+  //           // Reset container if it was showing no data message
+  //           if (donutChartHamaContainer.innerHTML.includes('Tidak ada data')) {
+  //             donutChartHamaContainer.innerHTML = '';
+  //             donutChartHama.render();
+  //           }
+            
+  //           window.donutChartHama.updateOptions({
+  //             labels: data.labels,
+  //             series: data.series,
+  //             colors: data.colors
+  //           });
+  //         }
+          
+  //         // Hide loading animation
+  //         if (donutChartHamaContainer) {
+  //           setTimeout(() => {
+  //             DashboardEnhancement.hideChartLoading(donutChartHamaContainer);
+  //             DashboardEnhancement.addChartAnimation(donutChartHamaContainer);
+  //           }, 500);
+  //         }
+  //       })
+  //       .catch(error => {
+  //         console.error('Error loading donut chart hama data:', error);
+  //         if (donutChartHamaContainer) {
+  //           DashboardEnhancement.hideChartLoading(donutChartHamaContainer);
+  //         }
+  //       });
+  //   }
 
-      $.ajax({
-        url: '/dashboard/donutchart',
-        type: 'GET',
-        dataType: 'json',
-        data: {
-          bulan: month,
-          tahun: year
-        },
-        success: function (response) {
-          // Remove any existing no-data messages first
-          const existingMessage = donutChartContainer.querySelector('.no-data-message');
-          if (existingMessage) {
-            existingMessage.remove();
-          }
+  //   // Function to load security layers for donut chart filter
+  //   function loadSecurityLayersForDonut() {
+  //     fetch('/dashboard/security-layers')
+  //       .then(response => response.json())
+  //       .then(layers => {
+  //         const lapisanSelect = document.getElementById('lapisanPengamanFilterDonutHama');
+  //         if (lapisanSelect) {
+  //           // Clear existing options except "Semua Lapisan"
+  //           lapisanSelect.innerHTML = '<option value="all" selected>Semua Lapisan</option>';
+            
+  //           // Add security layer options
+  //           layers.forEach(layer => {
+  //             const option = document.createElement('option');
+  //             option.value = layer;
+  //             option.textContent = `Lapisan ${layer}`;
+  //             lapisanSelect.appendChild(option);
+  //           });
+  //         }
+  //       })
+  //       .catch(error => {
+  //         console.error('Error loading security layers for donut:', error);
+  //       });
+  //   }
 
-          if (response.value && response.value.some(val => val > 0)) {
-            // We have valid data, update the chart
-            donutChart.updateOptions({
-              labels: response.metode,
-              series: response.value,
-              colors: response.colors,
-              metodeIds: response.metodeIds
-            });
-          } else {
-            // Handle empty data or all zeroes
-            if (donutChart) {
-              donutChart.updateOptions({
-                labels: [],
-                series: [],
-                colors: []
-              });
-            }
+  //   // Load initial data and security layers
+  //   loadSecurityLayersForDonut();
+  //   loadDonutChartHamaData();
 
-            // Create and add no-data message with better styling
-            const noDataEl = document.createElement('div');
-            noDataEl.className =
-              'no-data-message position-absolute top-50 start-50 translate-middle text-center w-100 px-4';
-            noDataEl.style.zIndex = '20'; // Higher zIndex to ensure visibility
-            noDataEl.innerHTML = `
-              <div class="card shadow-none bg-transparent">
-                <div class="card-body">
-                  <i class="bx bx-pie-chart-alt text-muted mb-3" style="font-size: 3rem;"></i>
-                  <h5 class="text-muted">No Data Available</h5>
-                  <p class="text-muted mb-0">There is no inspection data for ${month === 'all' ? 'all months in' : 'month ' + month + ' of'} ${year}</p>
-                  <button class="btn btn-outline-primary btn-sm mt-3" onclick="document.getElementById('monthFilterDonutChart').value='all'; document.getElementById('monthFilterDonutChart').dispatchEvent(new Event('change'));">
-                    View All Months
-                  </button>
-                </div>
-              </div>
-            `;
-            donutChartContainer.appendChild(noDataEl);
-          }
-        },
-        error: function (_, __, errorMsg) {
-          console.error('Error fetching donut chart data:', errorMsg);
+  //   // Security layer filter change handler
+  //   const lapisanPengamanFilterDonut = document.getElementById('lapisanPengamanFilterDonutHama');
+  //   if (lapisanPengamanFilterDonut) {
+  //     lapisanPengamanFilterDonut.addEventListener('change', function() {
+  //       const month = document.getElementById('monthFilterDonutHama')?.value || 'all';
+  //       const year = document.getElementById('yearFilterDonutHama')?.value || new Date().getFullYear();
+  //       loadDonutChartHamaData(month, year, this.value);
+  //     });
+  //   }
 
-          // Remove existing no-data message if it exists
-          if (donutChartContainer.querySelector('.no-data-message')) {
-            donutChartContainer.querySelector('.no-data-message').remove();
-          }
+  //   // Month filter change handler
+  //   const monthFilterDonutHama = document.getElementById('monthFilterDonutHama');
+  //   if (monthFilterDonutHama) {
+  //     monthFilterDonutHama.addEventListener('change', function() {
+  //       const year = document.getElementById('yearFilterDonutHama')?.value || new Date().getFullYear();
+  //       const lapisanPengaman = document.getElementById('lapisanPengamanFilterDonutHama')?.value || 'all';
+  //       loadDonutChartHamaData(this.value, year, lapisanPengaman);
+  //     });
+  //   }
 
-          // Clear any existing chart content first
-          if (donutChart) {
-            donutChart.updateOptions({
-              labels: [],
-              series: [],
-              colors: []
-            });
-          }
-
-          // Create and add error message with better styling
-          const errorEl = document.createElement('div');
-          errorEl.className =
-            'no-data-message position-absolute top-50 start-50 translate-middle text-center w-100 px-4';
-          errorEl.style.zIndex = '10'; // Ensure it appears on top
-          errorEl.innerHTML = `
-            <div class="card shadow-none bg-transparent">
-              <div class="card-body">
-                <i class="bx bx-error-circle text-danger mb-3" style="font-size: 3rem;"></i>
-                <h5 class="text-danger">Failed to Load Data</h5>
-                <p class="text-muted mb-0">An error occurred while retrieving the chart data</p>
-                <button class="btn btn-outline-primary btn-sm mt-3" onclick="updateDonutChart('${month}', '${year}')">
-                  Try Again
-                </button>
-              </div>
-            </div>
-          `;
-          donutChartContainer.appendChild(errorEl);
-        },
-        complete: function () {
-          // Wait a bit for the chart to render before checking for data
-          setTimeout(() => {
-            // Check if the chart has no data by looking for .apexcharts-series that has data
-            const hasData = donutChartContainer.querySelectorAll('.apexcharts-series path[stroke-width]').length > 0;
-
-            // Only show no-data message if we have no data AND don't already have a message
-            if (!hasData && !donutChartContainer.querySelector('.no-data-message')) {
-              const noDataEl = document.createElement('div');
-              noDataEl.className =
-                'no-data-message position-absolute top-50 start-50 translate-middle text-center w-100 px-4';
-              noDataEl.style.zIndex = '20'; // Higher zIndex to ensure visibility
-              noDataEl.innerHTML = `
-                <div class="card shadow-none bg-transparent">
-                  <div class="card-body">
-                    <i class="bx bx-pie-chart-alt text-muted mb-3" style="font-size: 3rem;"></i>
-                    <h5 class="text-muted">No Data Available</h5>
-                    <p class="text-muted mb-0">There is no inspection data for ${month === 'all' ? 'all months in' : 'month ' + month + ' of'} ${year}</p>
-                    <button class="btn btn-outline-primary btn-sm mt-3" onclick="document.getElementById('monthFilterDonutChart').value='all'; document.getElementById('monthFilterDonutChart').dispatchEvent(new Event('change'));">
-                      View All Months
-                    </button>
-                  </div>
-                </div>
-              `;
-              donutChartContainer.appendChild(noDataEl);
-            }
-
-            // Hide loading animation
-            donutChartContainer.classList.remove('chart-loading');
-            const spinner = donutChartContainer.querySelector('.chart-spinner');
-            if (spinner) {
-              spinner.style.display = 'none';
-            }
-          }, 500); // Small delay to ensure the chart has had time to render
-        }
-      });
-    };
-
-    // Initialize chart with current year and all months
-    const currentDate = new Date();
-    updateDonutChart('all', currentDate.getFullYear());
-
-    // Add event listeners for filter changes
-    document.getElementById('monthFilterDonutChart').addEventListener('change', function () {
-      const year = document.getElementById('yearFilterDonutChart').value;
-      updateDonutChart(this.value, year);
-    });
-
-    document.getElementById('yearFilterDonutChart').addEventListener('change', function () {
-      const month = document.getElementById('monthFilterDonutChart').value;
-      updateDonutChart(month, this.value);
-    });
-  }
+  //   // Year filter change handler
+  //   const yearFilterDonutHama = document.getElementById('yearFilterDonutHama');
+  //   if (yearFilterDonutHama) {
+  //     yearFilterDonutHama.addEventListener('change', function() {
+  //       const month = document.getElementById('monthFilterDonutHama')?.value || 'all';
+  //       const lapisanPengaman = document.getElementById('lapisanPengamanFilterDonutHama')?.value || 'all';
+  //       loadDonutChartHamaData(month, this.value, lapisanPengaman);
+  //     });
+  //   }
+  // }
 
   // Bar Chart
   // --------------------------------------------------------------------
@@ -1445,7 +1446,7 @@ import Swiper from 'swiper/bundle';
                           columns: [1, 2, 3, 4, 5, 6],
                           // prevent avatar to be display
                           format: {
-                            body: function (inner, coldex, rowdex) {
+                            body: function (inner) {
                               if (inner.length <= 0) return inner;
                               if (typeof inner === 'number') return inner;
                               var el = $.parseHTML(inner);
@@ -1632,6 +1633,7 @@ import Swiper from 'swiper/bundle';
                 }
               });
 
+
               // Show the modal
               $('#inspectionKondisiBaitModal').modal('show');
             }
@@ -1777,7 +1779,13 @@ import Swiper from 'swiper/bundle';
             },
             series: data.data,
             xaxis: {
-              categories: data.categories
+              categories: data.categories,
+              labels: {
+                style: {
+                  colors: labelColor,
+                  fontSize: '13px'
+                }
+              }
             },
             colors: ['#00E396', '#FEB019', '#FF4560']
           };
@@ -1824,8 +1832,8 @@ import Swiper from 'swiper/bundle';
 
   // Pie Chart
   // --------------------------------------------------------------------
-  const pieChartEl = document.querySelector('#pieChartTotal'),
-    pieChartConfig = {
+  const pieChartPGTEl = document.querySelector('#pieChartPGT'),
+    pieChartPGTConfig = {
       chart: {
         height: 400,
         type: 'pie',
@@ -1834,11 +1842,8 @@ import Swiper from 'swiper/bundle';
         },
         events: {
           dataPointSelection: function (event, chartContext, config) {
-            // console.log(config);
             const dataPointIndex = config.dataPointIndex;
             const selectedLabel = config.w.config.labels[dataPointIndex];
-
-            // console.log(selectedLabel);
 
             $('#namaLokasi').text(selectedLabel);
 
@@ -1850,10 +1855,7 @@ import Swiper from 'swiper/bundle';
               var tahun = document.getElementById('yearFilterPieChart').value;
               var bulan = document.getElementById('monthFilterPieChart').value;
 
-              // Show loading indicator if needed
-              // $('#inspeksiLokasiTableContainer').addClass('loading');
-
-              // tabel inspeksi lokasi
+              //tabel inspeksi lokasi
               $('#inspeksiLokasiTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -1869,10 +1871,6 @@ import Swiper from 'swiper/bundle';
                     if (xhr.status === 401) {
                       window.location.href = '/login';
                     }
-                    // $('#inspeksiLokasiTableContainer').removeClass('loading');
-                  },
-                  complete: function () {
-                    // $('#inspeksiLokasiTableContainer').removeClass('loading');
                   }
                 },
                 columns: [
@@ -1937,7 +1935,7 @@ import Swiper from 'swiper/bundle';
                         className: 'dropdown-item',
                         title: 'Data Inspeksi Lokasi ' + selectedLabel,
                         exportOptions: {
-                          columns: [1, 2, 3, 4, 5],
+                          columns: [1, 2, 3, 4, 5, 6],
                           format: {
                             body: function (inner) {
                               if (inner.length <= 0) return inner;
@@ -1974,7 +1972,7 @@ import Swiper from 'swiper/bundle';
                         className: 'dropdown-item',
                         title: 'Data Inspeksi Lokasi ' + selectedLabel,
                         exportOptions: {
-                          columns: [1, 2, 3, 4, 5],
+                          columns: [1, 2, 3, 4, 5, 6],
                           format: {
                             body: function (inner) {
                               if (inner.length <= 0) return inner;
@@ -1999,7 +1997,7 @@ import Swiper from 'swiper/bundle';
                         className: 'dropdown-item',
                         title: 'Data Inspeksi Lokasi ' + selectedLabel,
                         exportOptions: {
-                          columns: [1, 2, 3, 4, 5],
+                          columns: [1, 2, 3, 4, 5, 6],
                           format: {
                             body: function (inner) {
                               if (inner.length <= 0) return inner;
@@ -2024,7 +2022,7 @@ import Swiper from 'swiper/bundle';
                         className: 'dropdown-item',
                         title: 'Data Inspeksi Lokasi ' + selectedLabel,
                         exportOptions: {
-                          columns: [1, 2, 3, 4, 5],
+                          columns: [1, 2, 3, 4, 5, 6],
                           format: {
                             body: function (inner) {
                               if (inner.length <= 0) return inner;
@@ -2049,7 +2047,7 @@ import Swiper from 'swiper/bundle';
                         className: 'dropdown-item',
                         title: 'Data Inspeksi Lokasi ' + selectedLabel,
                         exportOptions: {
-                          columns: [1, 2, 3, 4, 5],
+                          columns: [1, 2, 3, 4, 5, 6],
                           format: {
                             body: function (inner) {
                               if (inner.length <= 0) return inner;
@@ -2081,7 +2079,7 @@ import Swiper from 'swiper/bundle';
                     }),
                     type: 'column',
                     renderer: function (api, rowIdx, columns) {
-                      var data = $.map(columns, function (col) {
+                      var data = $.map(columns, function (col, i) {
                         return col.title !== ''
                           ? '<tr data-dt-row="' +
                               col.rowIndex +
@@ -2180,7 +2178,7 @@ import Swiper from 'swiper/bundle';
                 show: true,
                 fontSize: '1.5rem',
                 color: headingColor,
-                label: 'Total',
+                label: 'PGT',
                 formatter: function () {
                   return parseInt(100, 10) + '%';
                 }
@@ -2263,13 +2261,286 @@ import Swiper from 'swiper/bundle';
       ]
     };
 
-  const pieChartPGTEl = document.querySelector('#pieChartPGT'),
-    pieChartPGTConfig = {
+  const pieChartRBSEl = document.querySelector('#pieChartRbs'),
+    pieChartRBSConfig = {
       chart: {
         height: 400,
         type: 'pie',
         toolbar: {
           show: false
+        },
+        events: {
+          dataPointSelection: function (event, chartContext, config) {
+            // console.log(config);
+            const dataPointIndex = config.dataPointIndex;
+            const selectedLabel = config.w.config.labels[dataPointIndex];
+
+            $('#namaLokasi').text(selectedLabel);
+
+            if (dataPointIndex !== -1) {
+              if ($.fn.DataTable.isDataTable('#inspeksiLokasiTable')) {
+                $('#inspeksiLokasiTable').DataTable().destroy();
+              }
+
+              var tahun = document.getElementById('yearFilterPieChart').value;
+              var bulan = document.getElementById('monthFilterPieChart').value;
+
+              // Show loading indicator if needed
+              // $('#inspeksiLokasiTableContainer').addClass('loading');
+
+              // tabel inspeksi lokasi
+              $('#inspeksiLokasiTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                  url: route('inspeksi.datahamaperlokasi'),
+                  type: 'GET',
+                  data: {
+                    lokasi: selectedLabel,
+                    bulan: bulan,
+                    tahun: tahun
+                  },
+                  error: function (xhr) {
+                    if (xhr.status === 401) {
+                      window.location.href = '/login';
+                    }
+                    // $('#inspeksiLokasiTableContainer').removeClass('loading');
+                  },
+                  complete: function () {
+                    // $('#inspeksiLokasiTableContainer').removeClass('loading');
+                  }
+                },
+                columns: [
+                  {
+                    data: 'id'
+                  },
+                  {
+                    data: 'tanggal'
+                  },
+                  {
+                    data: 'metode.metode_nama',
+                    render: function (data, type, row) {
+                      return row.metode ? row.metode.metode_nama : '';
+                    }
+                  },
+                  {
+                    data: 'lokasi.lokasi_nama',
+                    render: function (data, type, row) {
+                      return row.lokasi ? row.lokasi.lokasi_nama : '';
+                    }
+                  },
+                  {
+                    data: 'hama.hama_nama',
+                    render: function (data, type, row) {
+                      return row.hama ? row.hama.hama_nama : '-';
+                    }
+                  },
+                  {
+                    data: 'pegawai'
+                  },
+                  {
+                    data: 'jumlah'
+                  }
+                ],
+                columnDefs: [
+                  {
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 2,
+                    targets: 0,
+                    render: function () {
+                      return '';
+                    }
+                  }
+                ],
+                order: [[0, 'desc']],
+                dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+                displayLength: 10,
+                lengthMenu: [10, 25, 50, 75, 100],
+                buttons: [
+                  {
+                    extend: 'collection',
+                    className: 'btn btn-label-primary dropdown-toggle me-2',
+                    text: '<i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+                    buttons: [
+                      {
+                        extend: 'print',
+                        text: '<i class="bx bx-printer me-1" ></i>Print',
+                        className: 'dropdown-item',
+                        title: 'Data Inspeksi Lokasi ' + selectedLabel,
+                        exportOptions: {
+                          columns: [1, 2, 3, 4, 5, 6],
+                          format: {
+                            body: function (inner) {
+                              if (inner.length <= 0) return inner;
+                              if (typeof inner === 'number') return inner;
+                              var el = $.parseHTML(inner);
+                              var result = '';
+                              $.each(el, function (_, item) {
+                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                  result = result + item.lastChild.firstChild.textContent;
+                                } else if (item.innerText === undefined) {
+                                  result = result + item.textContent;
+                                } else result = result + item.innerText;
+                              });
+                              return result;
+                            }
+                          }
+                        },
+                        customize: function (win) {
+                          $(win.document.body)
+                            .css('color', config.colors.headingColor)
+                            .css('border-color', config.colors.borderColor)
+                            .css('background-color', config.colors.bodyBg);
+                          $(win.document.body)
+                            .find('table')
+                            .addClass('compact')
+                            .css('color', 'inherit')
+                            .css('border-color', 'inherit')
+                            .css('background-color', 'inherit');
+                        }
+                      },
+                      {
+                        extend: 'csv',
+                        text: '<i class="bx bx-file me-1" ></i>Csv',
+                        className: 'dropdown-item',
+                        title: 'Data Inspeksi Lokasi ' + selectedLabel,
+                        exportOptions: {
+                          columns: [1, 2, 3, 4, 5, 6],
+                          format: {
+                            body: function (inner) {
+                              if (inner.length <= 0) return inner;
+                              if (typeof inner === 'number') return inner;
+                              var el = $.parseHTML(inner);
+                              var result = '';
+                              $.each(el, function (_, item) {
+                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                  result = result + item.lastChild.firstChild.textContent;
+                                } else if (item.innerText === undefined) {
+                                  result = result + item.textContent;
+                                } else result = result + item.innerText;
+                              });
+                              return result;
+                            }
+                          }
+                        }
+                      },
+                      {
+                        extend: 'excel',
+                        text: '<i class="bx bxs-file-export me-1"></i>Excel',
+                        className: 'dropdown-item',
+                        title: 'Data Inspeksi Lokasi ' + selectedLabel,
+                        exportOptions: {
+                          columns: [1, 2, 3, 4, 5, 6],
+                          format: {
+                            body: function (inner) {
+                              if (inner.length <= 0) return inner;
+                              if (typeof inner === 'number') return inner;
+                              var el = $.parseHTML(inner);
+                              var result = '';
+                              $.each(el, function (_, item) {
+                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                  result = result + item.lastChild.firstChild.textContent;
+                                } else if (item.innerText === undefined) {
+                                  result = result + item.textContent;
+                                } else result = result + item.innerText;
+                              });
+                              return result;
+                            }
+                          }
+                        }
+                      },
+                      {
+                        extend: 'pdf',
+                        text: '<i class="bx bxs-file-pdf me-1"></i>Pdf',
+                        className: 'dropdown-item',
+                        title: 'Data Inspeksi Lokasi ' + selectedLabel,
+                        exportOptions: {
+                          columns: [1, 2, 3, 4, 5, 6],
+                          format: {
+                            body: function (inner) {
+                              if (inner.length <= 0) return inner;
+                              if (typeof inner === 'number') return inner;
+                              var el = $.parseHTML(inner);
+                              var result = '';
+                              $.each(el, function (_, item) {
+                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                  result = result + item.lastChild.firstChild.textContent;
+                                } else if (item.innerText === undefined) {
+                                  result = result + item.textContent;
+                                } else result = result + item.innerText;
+                              });
+                              return result;
+                            }
+                          }
+                        }
+                      },
+                      {
+                        extend: 'copy',
+                        text: '<i class="bx bx-copy me-1" ></i>Copy',
+                        className: 'dropdown-item',
+                        title: 'Data Inspeksi Lokasi ' + selectedLabel,
+                        exportOptions: {
+                          columns: [1, 2, 3, 4, 5, 6],
+                          format: {
+                            body: function (inner) {
+                              if (inner.length <= 0) return inner;
+                              if (typeof inner === 'number') return inner;
+                              var el = $.parseHTML(inner);
+                              var result = '';
+                              $.each(el, function (_, item) {
+                                if (item.classList !== undefined && item.classList.contains('user-name')) {
+                                  result = result + item.lastChild.firstChild.textContent;
+                                } else if (item.innerText === undefined) {
+                                  result = result + item.textContent;
+                                } else result = result + item.innerText;
+                              });
+                              return result;
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ],
+                responsive: {
+                  details: {
+                    display: $.fn.dataTable.Responsive.display.modal({
+                      header: function (row) {
+                        var data = row.data();
+                        return 'Details of Inspeksi';
+                      }
+                    }),
+                    type: 'column',
+                    renderer: function (api, rowIdx, columns) {
+                      var data = $.map(columns, function (col, i) {
+                        return col.title !== ''
+                          ? '<tr data-dt-row="' +
+                              col.rowIndex +
+                              '" data-dt-column="' +
+                              col.columnIndex +
+                              '">' +
+                              '<td>' +
+                              col.title +
+                              ':' +
+                              '</td> ' +
+                              '<td>' +
+                              col.data +
+                              '</td>' +
+                              '</tr>'
+                          : '';
+                      }).join('');
+
+                      return data ? $('<table class="table"/><tbody />').append(data) : false;
+                    }
+                  }
+                }
+              });
+
+              $('#inspectionLokasiModal').modal('show');
+            }
+          }
         }
       },
       labels: [],
@@ -2341,7 +2612,7 @@ import Swiper from 'swiper/bundle';
                 show: true,
                 fontSize: '1.5rem',
                 color: headingColor,
-                label: 'PGT',
+                label: 'FS',
                 formatter: function () {
                   return parseInt(100, 10) + '%';
                 }
@@ -2586,30 +2857,103 @@ import Swiper from 'swiper/bundle';
     };
 
   const updatePieCharts = (month, year) => {
-    const pieCharts = [
-      { el: pieChartEl, config: pieChartConfig, url: '/dashboard/piecharttotal' },
-      { el: pieChartPGTEl, config: pieChartPGTConfig, url: '/dashboard/piechartpgt' },
-      { el: pieChartFSEl, config: pieChartFSConfig, url: '/dashboard/piechartfs' }
-    ];
-
-    pieCharts.forEach(chart => {
-      if (typeof chart.el !== undefined && chart.el !== null) {
-        const pieChart = new ApexCharts(chart.el, chart.config);
-        pieChart.render();
-
-        $.getJSON(chart.url, { month, year }, function (response) {
-          if (response.series.length === 0 || response.labels.length === 0) {
-            chart.el.innerHTML = '<p class="text-center">No data available for the selected period.</p>';
-          } else {
-            pieChart.updateOptions({
-              labels: response.labels,
-              series: response.series
-            });
-          }
-        }).fail(function () {
-          chart.el.innerHTML = '<p class="text-center">Failed to load data.</p>';
-        });
+    // Show loading on all pie chart containers
+    const chartContainers = ['#pieChartRbs', '#pieChartPGT', '#pieChartFS'];
+    chartContainers.forEach(selector => {
+      const container = document.querySelector(selector);
+      if (container) {
+        DashboardEnhancement.showChartLoading(container);
       }
+    });
+
+    // First fetch all metode data
+    $.getJSON('/dashboard/metodes', function (metodesData) {
+      const metodeMap = {};
+      metodesData.forEach(metode => {
+        metodeMap[metode.id] = metode;
+      });
+
+      const pieCharts = [
+        { el: pieChartRBSEl, config: pieChartRBSConfig, url: '/dashboard/piechartrbs', metodeId: 3 },
+        { el: pieChartPGTEl, config: pieChartPGTConfig, url: '/dashboard/piechartpgt', metodeId: 1 },
+        { el: pieChartFSEl, config: pieChartFSConfig, url: '/dashboard/piechartfs', metodeId: 2 }
+      ];
+
+      pieCharts.forEach(chart => {
+        if (typeof chart.el !== undefined && chart.el !== null) {
+          // Get the method data for this chart
+          const metodeData = metodeMap[chart.metodeId];
+          const dynamicLabel = metodeData ? metodeData.metode_nama : 'Unknown';
+          
+          // Update the chart config with dynamic label
+          const updatedConfig = { ...chart.config };
+          if (updatedConfig.plotOptions && updatedConfig.plotOptions.pie && 
+              updatedConfig.plotOptions.pie.donut && updatedConfig.plotOptions.pie.donut.labels &&
+              updatedConfig.plotOptions.pie.donut.labels.total) {
+            updatedConfig.plotOptions.pie.donut.labels.total.label = dynamicLabel;
+          }
+          
+          const pieChart = new ApexCharts(chart.el, updatedConfig);
+          pieChart.render();
+
+          // Fetch the chart data
+          $.getJSON(chart.url, { month, year }, function (response) {
+            // Hide loading
+            DashboardEnhancement.hideChartLoading(chart.el);
+            
+            if (response.series.length === 0 || response.labels.length === 0) {
+              chart.el.innerHTML = '<div class="no-data-message">No data available for the selected period.</div>';
+            } else {
+              pieChart.updateOptions({
+                labels: response.labels,
+                series: response.series
+              });
+              DashboardEnhancement.addChartAnimation(chart.el);
+            }
+          }).fail(function () {
+            DashboardEnhancement.hideChartLoading(chart.el);
+            chart.el.innerHTML = '<div class="no-data-message">Failed to load data.</div>';
+            DashboardEnhancement.showNotification('Failed to load chart data', 'warning');
+          });
+        }
+      });
+    }).fail(function () {
+      // Hide loading on all containers
+      chartContainers.forEach(selector => {
+        const container = document.querySelector(selector);
+        if (container) {
+          DashboardEnhancement.hideChartLoading(container);
+        }
+      });
+      
+      DashboardEnhancement.showNotification('Failed to load method data, using defaults', 'info');
+      
+      // Fallback to original hardcoded labels if metodes fetch fails
+      const pieCharts = [
+        { el: pieChartRBSEl, config: pieChartRBSConfig, url: '/dashboard/piechartrbs' },
+        { el: pieChartPGTEl, config: pieChartPGTConfig, url: '/dashboard/piechartpgt' },
+        { el: pieChartFSEl, config: pieChartFSConfig, url: '/dashboard/piechartfs' }
+      ];
+
+      pieCharts.forEach(chart => {
+        if (typeof chart.el !== undefined && chart.el !== null) {
+          const pieChart = new ApexCharts(chart.el, chart.config);
+          pieChart.render();
+
+          $.getJSON(chart.url, { month, year }, function (response) {
+            if (response.series.length === 0 || response.labels.length === 0) {
+              chart.el.innerHTML = '<p class="text-center">No data available for the selected period.</p>';
+            } else {
+              pieChart.updateOptions({
+                labels: response.labels,
+                series: response.series
+              });
+            }
+          }).fail(function () {
+            chart.el.innerHTML = '<p class="text-center">Failed to load data.</p>';
+          });
+        }
+      });
     });
   };
 
@@ -2627,4 +2971,530 @@ import Swiper from 'swiper/bundle';
     const month = document.getElementById('monthFilterPieChart').value;
     updatePieCharts(month, this.value);
   });
+
+  if (typeof pieChartRBSEl !== undefined && pieChartRBSEl !== null) {
+    const pieChartRBS = new ApexCharts(pieChartRBSEl, pieChartRBSConfig);
+    pieChartRBS.render();
+  }
+
+  if (typeof pieChartPGTEl !== undefined && pieChartPGTEl !== null) {
+    const pieChartPGT = new ApexCharts(pieChartPGTEl, pieChartPGTConfig);
+    pieChartPGT.render();
+  }
+
+  if (typeof pieChartFSEl !== undefined && pieChartFSEl !== null) {
+    const pieChartFS = new ApexCharts(pieChartFSEl, pieChartFSConfig);
+    pieChartFS.render();
+  }
+
+  // Line Chart Hama
+  // --------------------------------------------------------------------
+  const lineChartHamaEl = document.querySelector('#lineChartHama'),
+    lineChartHamaConfig = {
+      chart: {
+        height: 400,
+        type: 'line',
+        parentHeightOffset: 0,
+        zoom: {
+          enabled: false
+        },
+        toolbar: {
+          show: true
+        },
+        events: {
+          click: function (event, chartContext, config) {
+            // Handle chart click events for location data
+            if (config.dataPointIndex !== -1) {
+              console.log('Clicked on location data:', config.seriesIndex, config.dataPointIndex);
+            }
+          }
+        }
+      },
+      series: [],
+      markers: {
+        strokeWidth: 7,
+        strokeOpacity: 1,
+        strokeColors: [cardColor],
+        colors: [config.colors.warning]
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        width: 3,
+        curve: 'smooth'
+      },
+      colors: [config.colors.primary, config.colors.info, config.colors.warning, config.colors.success, config.colors.danger, '#FF6B35', '#9C27B0', '#00BCD4', '#795548'],
+      grid: {
+        borderColor: borderColor,
+        xaxis: {
+          lines: {
+            show: true
+          }
+        },
+        padding: {
+          top: -20
+        }
+      },
+      legend: {
+        show: true,
+        position: 'bottom',
+        horizontalAlign: 'center'
+      },
+      tooltip: {
+        custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+          const locationName = w.globals.seriesNames[seriesIndex];
+          const value = series[seriesIndex][dataPointIndex];
+          const category = w.globals.labels[dataPointIndex];
+          
+          return `
+            <div class="tooltip-custom">
+              <div class="tooltip-header">${locationName}</div>
+              <div class="tooltip-body">
+                <div class="tooltip-item">
+                  <span class="tooltip-label">Period:</span>
+                  <span class="tooltip-value">${category}</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-label">Jumlah Inspeksi:</span>
+                  <span class="tooltip-value">${value}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      },
+      xaxis: {
+        categories: [],
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            colors: labelColor,
+            fontSize: '13px'
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: labelColor,
+            fontSize: '13px'
+          }
+        }
+      }
+    };
+
+  if (typeof lineChartHamaEl !== undefined && lineChartHamaEl !== null) {
+    const lineChartHama = new ApexCharts(lineChartHamaEl, lineChartHamaConfig);
+    lineChartHama.render();
+    window.lineChartHama = lineChartHama;
+
+    // Function to load location line chart data
+    function loadLineChartHamaData(month = 'all', year = null, lapisanPengaman = 'all') {
+      const lineChartHamaContainer = document.querySelector('#lineChartHama');
+      if (lineChartHamaContainer) {
+        DashboardEnhancement.showChartLoading(lineChartHamaContainer);
+      }
+      
+      const params = new URLSearchParams({
+        month: month,
+        year: year || new Date().getFullYear(),
+        lapisan_pengaman: lapisanPengaman
+      });
+      
+      fetch(`/dashboard/linecharthama?${params}`)
+        .then(response => response.json())
+        .then(data => {
+          window.lineChartHama.updateOptions({
+            series: data.data,
+            xaxis: {
+              categories: data.categories,
+              labels: {
+                style: {
+                  colors: labelColor,
+                  fontSize: '13px'
+                }
+              }
+            }
+          });
+          
+          // Hide loading animation
+          if (lineChartHamaContainer) {
+            setTimeout(() => {
+              DashboardEnhancement.hideChartLoading(lineChartHamaContainer);
+              DashboardEnhancement.addChartAnimation(lineChartHamaContainer);
+            }, 500);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading location line chart data:', error);
+          if (lineChartHamaContainer) {
+            DashboardEnhancement.hideChartLoading(lineChartHamaContainer);
+          }
+        });
+    }
+
+    // Function to load security layers for filter
+    function loadSecurityLayers() {
+      fetch('/dashboard/security-layers')
+        .then(response => response.json())
+        .then(layers => {
+          const lapisanSelect = document.getElementById('lapisanPengamanFilterLineChartHama');
+          if (lapisanSelect) {
+            // Clear existing options except "Semua Lapisan"
+            lapisanSelect.innerHTML = '<option value="all" selected>Semua Lapisan</option>';
+            
+            // Add security layer options
+            layers.forEach(layer => {
+              const option = document.createElement('option');
+              option.value = layer;
+              option.textContent = `Lapisan ${layer}`;
+              lapisanSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error loading security layers:', error);
+        });
+    }
+
+    // Load initial data and security layers
+    loadSecurityLayers();
+    loadLineChartHamaData();
+
+    // Security layer filter change handler
+    const lapisanPengamanFilter = document.getElementById('lapisanPengamanFilterLineChartHama');
+    if (lapisanPengamanFilter) {
+      lapisanPengamanFilter.addEventListener('change', function() {
+        const month = document.getElementById('monthFilterLineChartHama')?.value || 'all';
+        const year = document.getElementById('yearFilterLineChartHama')?.value || new Date().getFullYear();
+        loadLineChartHamaData(month, year, this.value);
+      });
+    }
+
+    // Month filter change handler
+    const monthFilterHama = document.getElementById('monthFilterLineChartHama');
+    if (monthFilterHama) {
+      monthFilterHama.addEventListener('change', function() {
+        const year = document.getElementById('yearFilterLineChartHama')?.value || new Date().getFullYear();
+        const lapisanPengaman = document.getElementById('lapisanPengamanFilterLineChartHama')?.value || 'all';
+        loadLineChartHamaData(this.value, year, lapisanPengaman);
+      });
+    }
+
+    // Year filter change handler
+    const yearFilterHama = document.getElementById('yearFilterLineChartHama');
+    if (yearFilterHama) {
+      yearFilterHama.addEventListener('change', function() {
+        const month = document.getElementById('monthFilterLineChartHama')?.value || 'all';
+        const lapisanPengaman = document.getElementById('lapisanPengamanFilterLineChartHama')?.value || 'all';
+        loadLineChartHamaData(month, this.value, lapisanPengaman);
+      });
+    }
+  }
+
+  // Add event listener for the "Show All Methods" button
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'showAllInspeksiBtn') {
+        if ($.fn.DataTable.isDataTable('#inspeksiTable')) {
+          $('#inspeksiTable').DataTable().destroy();
+        }
+        
+        var bulanText = document.getElementById('bulanInspeksi').textContent;
+        var tahun = document.getElementById('tahunInspeksi').textContent;
+        var bulanIndex = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+                         .findIndex(month => month === bulanText) + 1;
+        
+        // Update title to indicate all methods are shown
+        document.getElementById('namaMetodeInspeksi').innerHTML = '- Semua Metode - ';
+        
+        // Reinitialize datatable without method filter
+        $('#inspeksiTable').DataTable({
+          processing: true,
+          serverSide: true,
+          ajax: {
+            url: route('inspeksi.dataperbulan'),
+            type: 'GET',
+            data: {
+              bulan: bulanIndex,
+              tahun: tahun
+              // No metodeId here, to show all methods
+            },
+            error: function (xhr) {
+              if (xhr.status === 401) {
+                window.location.href = '/login';
+              }
+            }
+          },
+          columns: [
+            { data: 'id' },
+            { data: 'tanggal' },
+            { data: 'metode.metode_nama' },
+            { data: 'lokasi.lokasi_nama' },
+            { data: 'hama.hama_nama' },
+            { data: 'user.name' },
+            { data: 'jumlah' }
+          ],
+          dom: 'Bfrtip',
+          buttons: [
+            // Keep existing buttons configuration
+            'print', 'csv', 'excel', 'pdf'
+          ]
+        });
+      }
+    });
+  });
+
+  // Donut Chart Hama
+  // --------------------------------------------------------------------
+  const donutChartHamaEl = document.querySelector('#donutChartHama'),
+    donutChartHamaConfig = {
+      chart: {
+        height: 390,
+        type: 'donut',
+        events: {
+          dataPointSelection: function (event, chartContext, config) {
+            // Handle donut chart click events for hama data
+            if (config.dataPointIndex !== -1) {
+              console.log('Clicked on hama donut:', config.dataPointIndex);
+            }
+          }
+        }
+      },
+      labels: [],
+      series: [],
+      colors: [],
+      stroke: {
+        show: false,
+        curve: 'straight'
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          return val.toFixed(1) + '%';
+        },
+        style: {
+          fontSize: '14px',
+          fontFamily: 'Public Sans',
+          fontWeight: 500,
+          colors: ['#fff']
+        }
+      },
+      legend: {
+        show: true,
+        position: 'bottom',
+        markers: { offsetX: -3 },
+        itemMargin: {
+          vertical: 3,
+          horizontal: 10
+        },
+        labels: {
+          colors: legendColor,
+          useSeriesColors: false
+        }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              name: {
+                fontSize: '2rem',
+                fontFamily: 'Public Sans'
+              },
+              value: {
+                fontSize: '1.2rem',
+                color: legendColor,
+                fontFamily: 'Public Sans',
+                formatter: function (val) {
+                  return parseInt(val);
+                }
+              },
+              total: {
+                show: true,
+                fontSize: '1.5rem',
+                color: headingColor,
+                label: 'Total Hama',
+                formatter: function (w) {
+                  return w.globals.seriesTotals.reduce((a, b) => {
+                    return a + b;
+                  }, 0);
+                }
+              }
+            }
+          }
+        }
+      },
+      tooltip: {
+        custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+          const hamaName = w.globals.labels[seriesIndex];
+          const value = series[seriesIndex];
+          const percentage = ((value / w.globals.seriesTotals.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+          
+          return `
+            <div class="tooltip-custom">
+              <div class="tooltip-header">${hamaName}</div>
+              <div class="tooltip-body">
+                <div class="tooltip-item">
+                  <span class="tooltip-label">Jumlah:</span>
+                  <span class="tooltip-value">${value}</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-label">Persentase:</span>
+                  <span class="tooltip-value">${percentage}%</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      },
+      responsive: [
+        {
+          breakpoint: 992,
+          options: {
+            chart: {
+              height: 380
+            }
+          }
+        },
+        {
+          breakpoint: 576,
+          options: {
+            chart: {
+              height: 320
+            }
+          }
+        },
+        {
+          breakpoint: 420,
+          options: {
+            chart: {
+              height: 280
+            },
+            legend: {
+              show: false
+            }
+          }
+        }
+      ]
+    };
+
+  if (typeof donutChartHamaEl !== undefined && donutChartHamaEl !== null) {
+    const donutChartHama = new ApexCharts(donutChartHamaEl, donutChartHamaConfig);
+    donutChartHama.render();
+    window.donutChartHama = donutChartHama;
+
+    // Function to load donut chart hama data
+    function loadDonutChartHamaData(month = 'all', year = null, lapisanPengaman = 'all') {
+      const donutChartHamaContainer = document.querySelector('#donutChartHama');
+      if (donutChartHamaContainer) {
+        DashboardEnhancement.showChartLoading(donutChartHamaContainer);
+      }
+      
+      const params = new URLSearchParams({
+        month: month,
+        year: year || new Date().getFullYear(),
+        lapisan_pengaman: lapisanPengaman
+      });
+      
+      fetch(`/dashboard/donuthama?${params}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.series.length === 0 || data.labels.length === 0) {
+            donutChartHamaContainer.innerHTML = '<div class="text-center p-4"><p>Tidak ada data hama untuk periode yang dipilih.</p></div>';
+          } else {
+            // Reset container if it was showing no data message
+            if (donutChartHamaContainer.innerHTML.includes('Tidak ada data')) {
+              donutChartHamaContainer.innerHTML = '';
+              donutChartHama.render();
+            }
+            
+            window.donutChartHama.updateOptions({
+              labels: data.labels,
+              series: data.series,
+              colors: data.colors
+            });
+          }
+          
+          // Hide loading animation
+          if (donutChartHamaContainer) {
+            setTimeout(() => {
+              DashboardEnhancement.hideChartLoading(donutChartHamaContainer);
+              DashboardEnhancement.addChartAnimation(donutChartHamaContainer);
+            }, 500);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading donut chart hama data:', error);
+          if (donutChartHamaContainer) {
+            DashboardEnhancement.hideChartLoading(donutChartHamaContainer);
+          }
+        });
+    }
+
+    // Function to load security layers for donut chart filter
+    function loadSecurityLayersForDonut() {
+      fetch('/dashboard/security-layers')
+        .then(response => response.json())
+        .then(layers => {
+          const lapisanSelect = document.getElementById('lapisanPengamanFilterDonutHama');
+          if (lapisanSelect) {
+            // Clear existing options except "Semua Lapisan"
+            lapisanSelect.innerHTML = '<option value="all" selected>Semua Lapisan</option>';
+            
+            // Add security layer options
+            layers.forEach(layer => {
+              const option = document.createElement('option');
+              option.value = layer;
+              option.textContent = `Lapisan ${layer}`;
+              lapisanSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error loading security layers for donut:', error);
+        });
+    }
+
+    // Load initial data and security layers
+    loadSecurityLayersForDonut();
+    loadDonutChartHamaData();
+
+    // Security layer filter change handler
+    const lapisanPengamanFilterDonut = document.getElementById('lapisanPengamanFilterDonutHama');
+    if (lapisanPengamanFilterDonut) {
+      lapisanPengamanFilterDonut.addEventListener('change', function() {
+        const month = document.getElementById('monthFilterDonutHama')?.value || 'all';
+        const year = document.getElementById('yearFilterDonutHama')?.value || new Date().getFullYear();
+        loadDonutChartHamaData(month, year, this.value);
+      });
+    }
+
+    // Month filter change handler
+    const monthFilterDonutHama = document.getElementById('monthFilterDonutHama');
+    if (monthFilterDonutHama) {
+      monthFilterDonutHama.addEventListener('change', function() {
+        const year = document.getElementById('yearFilterDonutHama')?.value || new Date().getFullYear();
+        const lapisanPengaman = document.getElementById('lapisanPengamanFilterDonutHama')?.value || 'all';
+        loadDonutChartHamaData(this.value, year, lapisanPengaman);
+      });
+    }
+
+    // Year filter change handler
+    const yearFilterDonutHama = document.getElementById('yearFilterDonutHama');
+    if (yearFilterDonutHama) {
+      yearFilterDonutHama.addEventListener('change', function() {
+        const month = document.getElementById('monthFilterDonutHama')?.value || 'all';
+        const lapisanPengaman = document.getElementById('lapisanPengamanFilterDonutHama')?.value || 'all';
+        loadDonutChartHamaData(month, this.value, lapisanPengaman);
+      });
+    }
+  }
 })();
