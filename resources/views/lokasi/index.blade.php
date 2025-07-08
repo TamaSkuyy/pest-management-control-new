@@ -434,6 +434,7 @@
                                 lokasi_kode: new_lokasi_kode,
                                 lokasi_nama: new_lokasi_nama,
                                 lokasi_jenis: new_lokasi_jenis,
+                                lokasi_lapisan_pengaman: new_lokasi_lapisan_pengaman,
                             },
                             success: function(response) {
                                 // console.log(response); // Check the response in the console
